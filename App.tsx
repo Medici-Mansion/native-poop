@@ -22,7 +22,7 @@ const UserIcon = () => <Icon name="user" size={20} color="white" />;
 function App(): JSX.Element {
   const [login, setLogin] = useState();
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView style={{flex: 1}}>
       <ReactQueryProvider>
         <NavigationContainer>
           {login ? (
