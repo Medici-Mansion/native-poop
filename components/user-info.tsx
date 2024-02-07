@@ -1,7 +1,12 @@
-import {Text, View} from 'react-native';
+import {View, Text} from 'react-native';
+import React from 'react';
 
 const UserInfo = () => {
-  return <></>;
+  return (
+    <View>
+      <Text>UserInfo</Text>
+    </View>
+  );
 };
 
 export default UserInfo;

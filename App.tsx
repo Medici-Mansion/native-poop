@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/AntDesign';
+import SplashScreen from 'react-native-splash-screen';
 
 import ReactQueryProvider from '@/provider/react-query.provider';
 import HomeScreen from '@/screens/home';
@@ -19,6 +20,12 @@ const UserIcon = () => <Icon name="user" size={20} color="white" />;
 
 function App(): JSX.Element {
   const [login, setLogin] = useState();
+
+  useEffect(() => {
+    setTimeout(() => {
+      SplashScreen.hide();
+    }, 2000);
+  }, []);
   return (
     <SafeAreaView style={{flex: 1}}>
       <ReactQueryProvider>
