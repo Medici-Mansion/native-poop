@@ -1,32 +1,97 @@
+import React from 'react';
 import {Pressable, Text, TextInput, View} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import React from 'react';
+import {useForm, Controller} from 'react-hook-form';
+
+import {useUserStore} from '@/store/user-store';
 
 const LoginScreen = () => {
+  const {login, logout} = useUserStore();
+
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+  } = useForm({
+    defaultValues: {
+      id: '',
+      password: '',
+    },
+  });
+
+  const onSubmit = (data: any) => {
+    login();
+    console.log(data);
+  };
+
   return (
     <KeyboardAwareScrollView
-      contentContainerStyle={{flex: 1, justifyContent: 'center'}}
-      className="bg-rose-500">
-      <View className="flex-1 justify-center p-3">
-        <Pressable className="flex space-y-3 bg-blue-400">
-          <Text>123</Text>
-          <Text>123</Text>
-          <Text>123</Text>
-          <Text>123</Text>
-          <Text>123</Text>
+      contentContainerStyle={{
+        flex: 1,
+        justifyContent: 'center',
+        backgroundColor: '#191919',
+      }}>
+      <View className="justify-center" style={{flex: 3}}>
+        <Pressable className="flex space-y-3 justify-center items-center">
+          <Text className="text-white">디자인 필요</Text>
         </Pressable>
       </View>
-      <View className="flex-1 p-3 space-y-2">
-        <Text className="px-5">Id</Text>
-        <TextInput
-          placeholder="text input id"
-          className="p-2 border rounded-full bg-slate-200"
-        />
-        <Text className="px-5">Password</Text>
-        <TextInput
-          placeholder="text input id"
-          className="p-2 border rounded-full bg-slate-200"
-        />
+      <View className="p-5" style={{flex: 4}}>
+        <View className="space-y-2">
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+            }}
+            render={({field: {onChange, onBlur, value}}) => (
+              <TextInput
+                placeholder="아이디"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                className="p-2 border rounded-md bg-black text-white"
+                placeholderTextColor={'gray'}
+                selectionColor={'white'}
+              />
+            )}
+            name="id"
+          />
+          {errors.id && <Text className="text-white">This is required.</Text>}
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+            }}
+            render={({field: {onChange, onBlur, value}}) => (
+              <TextInput
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                placeholder="비밀번호"
+                className="p-2 mt-2 border rounded-md bg-black text-white"
+                placeholderTextColor={'gray'}
+                selectionColor={'white'}
+                secureTextEntry
+              />
+            )}
+            name="password"
+          />
+          {errors.password && (
+            <Text className="text-white">This is required.</Text>
+          )}
+        </View>
+        <View className="space-y-2 mt-5">
+          <Pressable
+            className="bg-white rounded-md py-4 flex items-center"
+            onPress={handleSubmit(onSubmit)}>
+            <Text>로그인</Text>
+          </Pressable>
+          <Pressable
+            className="bg-[#191919] rounded-md py-4 flex items-center border border-white"
+            onPress={() => console.log('press')}>
+            <Text className="text-white">회원가입</Text>
+          </Pressable>
+        </View>
       </View>
     </KeyboardAwareScrollView>
   );

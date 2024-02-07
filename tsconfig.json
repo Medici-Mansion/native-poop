@@ -8,8 +8,9 @@
       "@/components/*": ["components/*"],
       "@/screens/*": ["screens/*"],
       "@/hooks/*": ["hooks/*"],
-      "@/provider*": ["provider*"],
-      "@/apis*": ["apis*"]
+      "@/provider*": ["provider/*"],
+      "@/apis/*": ["apis/*"],
+      "@/store/*": ["store/*"]
     }
   }
 }

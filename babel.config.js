@@ -24,6 +24,7 @@ module.exports = {
           '@/hooks': './hooks',
           '@/apis': './apis',
           '@/provider': './provider',
+          '@/store': './store',
         },
       },
     ],

@@ -11,6 +11,7 @@ import HomeScreen from '@/screens/home';
 import PeedScreen from '@/screens/peed';
 import LoginScreen from '@/screens/login';
 import Settings from '@/screens/settings';
+import {useUserStore} from '@/store/user-store';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -19,18 +20,17 @@ const HomeTabIcon = () => <Icon name="delete" size={20} color="white" />;
 const UserIcon = () => <Icon name="user" size={20} color="white" />;
 
 function App(): JSX.Element {
-  const [login, setLogin] = useState();
+  const {isLogin} = useUserStore();
 
   useEffect(() => {
-    setTimeout(() => {
-      SplashScreen.hide();
-    }, 2000);
+    SplashScreen.hide();
   }, []);
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <ReactQueryProvider>
         <NavigationContainer>
-          {login ? (
+          {isLogin ? (
             <Tab.Navigator
               initialRouteName="Home"
               screenOptions={{
