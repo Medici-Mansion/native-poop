@@ -1,49 +1,19 @@
-import {Button, ScrollView, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import dayjs from 'dayjs';
+import React from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import {useNavi} from '@/hooks/useNavi';
-import LoadingScreen from '@/screens/loading';
-import {arr} from '../mok';
+import WrapperView from '@/components/wrapper-view';
+
+import PeedList from '@/screens/peed-list';
+import UserDetail from './user-detail';
+
+const Stack = createNativeStackNavigator();
 
 const HomeScreen = () => {
-  const [loading, setLoading] = useState(false);
-  const navigation = useNavi();
-  const today = dayjs().format('YYYY-MM-DD');
-
-  useEffect(() => {
-    setLoading(false);
-  }, []);
-
-  if (loading) return <LoadingScreen />;
-
   return (
-    <View style={{flex: 1}}>
-      <View
-        className="p-5 bg-black flex flex-row justify-between items-center"
-        style={{flex: 1}}>
-        <View className="bg-slate-300 rounded-full p-2">
-          <Text className="text-black">awef</Text>
-        </View>
-        <View>
-          <Text className="text-white">{'test user'}</Text>
-        </View>
-        <View>
-          <Text className="text-white">{today}</Text>
-        </View>
-      </View>
-      <View className="bg-black text-white" style={{flex: 9}}>
-        <ScrollView>
-          {arr.map(item => {
-            return (
-              <View>
-                <Text className="text-white p-5">{item.title}</Text>
-              </View>
-            );
-          })}
-        </ScrollView>
-      </View>
-    </View>
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="PeedList" component={PeedList} />
+      <Stack.Screen name="UserDetail" component={UserDetail} />
+    </Stack.Navigator>
   );
 };
 

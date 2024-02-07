@@ -8,16 +8,18 @@ import SplashScreen from 'react-native-splash-screen';
 
 import ReactQueryProvider from '@/provider/react-query.provider';
 import HomeScreen from '@/screens/home';
-import PeedScreen from '@/screens/peed';
+import UploadScreen from '@/screens/upload';
 import LoginScreen from '@/screens/login';
 import Settings from '@/screens/settings';
 import {useUserStore} from '@/store/user-store';
+import SignUp from './screens/sign-up';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const HomeTabIcon = () => <Icon name="delete" size={20} color="white" />;
-const UserIcon = () => <Icon name="user" size={20} color="white" />;
+const UploadIcon = () => <Icon name="up-square-o" size={20} color="white" />;
+const HomeTabIcon = () => <Icon name="bars" size={20} color="white" />;
+const SettingIcon = () => <Icon name="setting" size={20} color="white" />;
 
 function App(): JSX.Element {
   const {isLogin} = useUserStore();
@@ -47,22 +49,25 @@ function App(): JSX.Element {
                   tabBarIcon: HomeTabIcon,
                 }}
               />
-              <Tab.Screen name="Peed" component={PeedScreen} />
               <Tab.Screen
-                name="Settings"
+                name="Upload"
+                component={UploadScreen}
+                options={{
+                  tabBarIcon: UploadIcon,
+                }}
+              />
+              <Tab.Screen
+                name="Setting"
                 component={Settings}
                 options={{
-                  tabBarIcon: UserIcon,
+                  tabBarIcon: SettingIcon,
                 }}
               />
             </Tab.Navigator>
           ) : (
-            <Stack.Navigator>
-              <Stack.Screen
-                name="Login"
-                component={LoginScreen}
-                options={{headerShown: false}}
-              />
+            <Stack.Navigator screenOptions={{headerShown: false}}>
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="SignUp" component={SignUp} />
             </Stack.Navigator>
           )}
         </NavigationContainer>

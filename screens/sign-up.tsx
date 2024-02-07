@@ -6,7 +6,7 @@ import {useForm, Controller} from 'react-hook-form';
 import {useUserStore} from '@/store/user-store';
 import {useNavi} from '@/hooks/useNavi';
 
-const LoginScreen = () => {
+const SignUpScreen = () => {
   const {login, logout} = useUserStore();
   const navigation = useNavi();
   const {
@@ -20,9 +20,8 @@ const LoginScreen = () => {
     },
   });
 
-  const onSubmit = (data: any) => {
-    login();
-    console.log(data);
+  const onSubmit = (data: {id: string; password: string}) => {
+    navigation.goBack();
   };
 
   return (
@@ -85,12 +84,7 @@ const LoginScreen = () => {
           <Pressable
             className="bg-white rounded-md py-4 flex items-center"
             onPress={handleSubmit(onSubmit)}>
-            <Text>로그인</Text>
-          </Pressable>
-          <Pressable
-            className="bg-[#191919] rounded-md py-4 flex items-center border border-white"
-            onPress={() => navigation.navigate('SignUp')}>
-            <Text className="text-white">회원가입</Text>
+            <Text>가입하기</Text>
           </Pressable>
         </View>
       </View>
@@ -98,4 +92,4 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default SignUpScreen;

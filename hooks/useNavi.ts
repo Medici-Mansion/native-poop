@@ -5,6 +5,8 @@ type RootStackParam = {
   Home: undefined;
   Peed: undefined;
   Settings: undefined;
+  UserDetail: undefined;
+  SignUp: undefined;
 };
 
 export const useNavi = () => {
