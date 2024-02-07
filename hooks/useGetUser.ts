@@ -1,15 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-import APIs from "../apis";
+import {useQuery} from '@tanstack/react-query';
+import APIs from '@/apis/index';
 
 const useGetUser = () => {
-  const { data, isLoading } = useQuery({
+  const {data, isLoading} = useQuery({
     queryKey: ['get-user'],
-    queryFn: () => APIs.getUser()
-  })
+    queryFn: () => APIs.getUser(),
+  });
 
   return {
-    data, isLoading
-  }
-}
+    data,
+    isLoading,
+  };
+};
 
-export default useGetUser
+export default useGetUser;

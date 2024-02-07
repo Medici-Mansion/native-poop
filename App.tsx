@@ -3,15 +3,13 @@ import {SafeAreaView} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-
-import ReactQueryProvider from './provider/react-query.provider';
-
-import HomeScreen from './screens/home';
-import PeedScreen from './screens/peed';
-import LoginScreen from './screens/login';
-
 import Icon from 'react-native-vector-icons/AntDesign';
-import Settings from './screens/settings';
+
+import ReactQueryProvider from '@/provider/react-query.provider';
+import HomeScreen from '@/screens/home';
+import PeedScreen from '@/screens/peed';
+import LoginScreen from '@/screens/login';
+import Settings from '@/screens/settings';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();

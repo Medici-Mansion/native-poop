@@ -1,5 +1,5 @@
 import {Button, Text, View} from 'react-native';
-import {useNavi} from '../hooks/useNavi';
+import {useNavi} from '@/hooks/useNavi';
 
 const PeedScreen = () => {
   const navigation = useNavi();

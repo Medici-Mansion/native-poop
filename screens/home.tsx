@@ -1,8 +1,9 @@
 import {Button, ScrollView, Text, View} from 'react-native';
-import dayjs from 'dayjs';
-import {useNavi} from '../hooks/useNavi';
 import React, {useEffect, useState} from 'react';
-import LoadingScreen from './loading';
+import dayjs from 'dayjs';
+
+import {useNavi} from '@/hooks/useNavi';
+import LoadingScreen from '@/screens/loading';
 import {arr} from '../mok';
 
 const HomeScreen = () => {
