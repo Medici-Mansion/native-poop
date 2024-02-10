@@ -5,11 +5,11 @@ import {useNavi} from '@/hooks/useNavi';
 
 const UserInfo = () => {
   const today = dayjs().format('YYYY-MM-DD');
-  const navigation = useNavi();
+  const {navigation} = useNavi();
 
   return (
     <View
-      className="p-5 bg-black flex flex-row justify-between items-center"
+      className="px-5 bg-slate-800 flex flex-row justify-between items-center"
       style={{flex: 1}}>
       <View className="bg-slate-300 rounded-full p-2">
         <Text className="text-black">awef</Text>
@@ -18,7 +18,13 @@ const UserInfo = () => {
         <Text className="text-white">{'test user'}</Text>
       </View>
       <View>
-        <Pressable onPress={() => navigation.navigate('UserDetail')}>
+        <Pressable
+          onPress={() =>
+            navigation.navigate('UserDetail', {
+              id: 1,
+              title: 'asdf',
+            })
+          }>
           <Text className="text-white">{today}</Text>
         </Pressable>
       </View>

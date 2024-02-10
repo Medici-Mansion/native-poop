@@ -3,7 +3,6 @@ import {SafeAreaView} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/AntDesign';
 import SplashScreen from 'react-native-splash-screen';
 
 import ReactQueryProvider from '@/provider/react-query.provider';
@@ -14,12 +13,10 @@ import Settings from '@/screens/settings';
 import {useUserStore} from '@/store/user-store';
 import SignUp from './screens/sign-up';
 
+import {HomeTabIcon, SettingIcon, UploadIcon} from './assets/icons';
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-
-const UploadIcon = () => <Icon name="up-square-o" size={20} color="white" />;
-const HomeTabIcon = () => <Icon name="bars" size={20} color="white" />;
-const SettingIcon = () => <Icon name="setting" size={20} color="white" />;
 
 function App(): JSX.Element {
   const {isLogin} = useUserStore();

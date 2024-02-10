@@ -10,7 +10,8 @@
       "@/hooks/*": ["hooks/*"],
       "@/provider*": ["provider/*"],
       "@/apis/*": ["apis/*"],
-      "@/store/*": ["store/*"]
+      "@/store/*": ["store/*"],
+      "@/assets/*": ["assets/*"]
     }
   }
 }

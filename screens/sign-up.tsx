@@ -8,7 +8,7 @@ import {useNavi} from '@/hooks/useNavi';
 
 const SignUpScreen = () => {
   const {login, logout} = useUserStore();
-  const navigation = useNavi();
+  const {navigation} = useNavi();
   const {
     control,
     handleSubmit,
