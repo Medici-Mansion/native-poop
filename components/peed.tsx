@@ -8,7 +8,7 @@ interface PeedProps {
 
 const Peed = ({id, title}: PeedProps) => {
   return (
-    <View className="p-5 space-y-3">
+    <View className="border border-white items-center pb-2 m-5 py-20">
       <Text className="text-white">{id}</Text>
       <Text className="text-white">{title}</Text>
     </View>

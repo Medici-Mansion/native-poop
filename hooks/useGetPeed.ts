@@ -1,10 +1,10 @@
 import {useQuery} from '@tanstack/react-query';
 import APIs from '@/apis/index';
 
-const useGetUser = () => {
+const useGetPeed = () => {
   const {data, isLoading} = useQuery({
-    queryKey: ['get-user'],
-    queryFn: () => APIs.getUser(),
+    queryKey: ['get-peed'],
+    queryFn: () => APIs.getPeed(),
   });
 
   return {
@@ -13,4 +13,4 @@ const useGetUser = () => {
   };
 };
 
-export default useGetUser;
+export default useGetPeed;

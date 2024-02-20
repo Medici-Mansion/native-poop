@@ -7,7 +7,7 @@ interface User {
 }
 
 export const useUserStore = create<User>(set => ({
-  isLogin: true,
+  isLogin: false,
 
   login: () => {
     set(state => ({

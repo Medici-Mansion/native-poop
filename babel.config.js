@@ -26,6 +26,7 @@ module.exports = {
           '@/provider': './provider',
           '@/store': './store',
           '@/assets': './assets',
+          '@/types': './types',
         },
       },
     ],

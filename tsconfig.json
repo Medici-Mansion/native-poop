@@ -11,7 +11,8 @@
       "@/provider*": ["provider/*"],
       "@/apis/*": ["apis/*"],
       "@/store/*": ["store/*"],
-      "@/assets/*": ["assets/*"]
+      "@/assets/*": ["assets/*"],
+      "@/types/*": ["types/*"]
     }
   }
 }

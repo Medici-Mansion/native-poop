@@ -1,15 +1,12 @@
-import axios from 'axios'
+import axios from 'axios';
 
-const getUser = async () => {
-  const param = {
-    locations: []
-  }
-  const res = await axios.post('https://m.studymoa.me/api/moim/main/study', param)
-  return res.data
-}
+const getPeed = async () => {
+  const res = await axios.get('http://172.30.1.254/posts');
+  return res.data;
+};
 
 const APIs = {
-  getUser
-}
+  getPeed,
+};
 
-export default APIs
+export default APIs;
