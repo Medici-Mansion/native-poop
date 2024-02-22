@@ -13,7 +13,7 @@ const PeedList = () => {
         <ScrollView>
           {arr.map((item: any) => {
             return (
-              <View key={item.id + ''}>
+              <View key={item.id}>
                 <Peed id={item.id} title={item.title} />
               </View>
             );
