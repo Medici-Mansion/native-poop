@@ -1,19 +1,29 @@
-import React, {useEffect, useState} from 'react';
-import {SafeAreaView} from 'react-native';
+import React, {useEffect} from 'react';
+import {Pressable, SafeAreaView, Text} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import SplashScreen from 'react-native-splash-screen';
-
+import {useUserStore} from '@/store/user-store';
 import ReactQueryProvider from '@/provider/react-query.provider';
+
 import HomeScreen from '@/screens/home';
 import UploadScreen from '@/screens/upload';
 import LoginScreen from '@/screens/login';
 import Settings from '@/screens/settings';
-import {useUserStore} from '@/store/user-store';
-import SignUp from './screens/sign-up';
+import SearchScreen from '@/screens/search';
+import SignUp from '@/screens/sign-up';
 
-import {HomeTabIcon, SettingIcon, UploadIcon} from './assets/icons';
+import {
+  HomeTabIcon,
+  ListIcon,
+  PlusIcon,
+  SearchIcon,
+  SettingIcon,
+} from '@/assets/icons';
+import ListScreen from './screens/list';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -36,7 +46,7 @@ function App(): JSX.Element {
                 headerShown: false,
                 tabBarShowLabel: false,
                 tabBarStyle: {backgroundColor: 'black'},
-                tabBarActiveTintColor: 'white',
+                tabBarActiveTintColor: 'black',
               }}>
               <Tab.Screen
                 name="Home"
@@ -47,16 +57,34 @@ function App(): JSX.Element {
                 }}
               />
               <Tab.Screen
+                name="Search"
+                component={SearchScreen}
+                options={{
+                  title: 'Home',
+                  tabBarIcon: SearchIcon,
+                }}
+              />
+              <Tab.Screen
                 name="Upload"
                 component={UploadScreen}
                 options={{
-                  tabBarIcon: UploadIcon,
+                  title: 'Upload',
+                  tabBarIcon: PlusIcon,
+                }}
+              />
+              <Tab.Screen
+                name="List"
+                component={ListScreen}
+                options={{
+                  title: 'Upload',
+                  tabBarIcon: ListIcon,
                 }}
               />
               <Tab.Screen
                 name="Setting"
                 component={Settings}
                 options={{
+                  title: 'Setting',
                   tabBarIcon: SettingIcon,
                 }}
               />

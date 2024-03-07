@@ -3,10 +3,12 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 type RootStackParam = {
   Home: undefined;
-  Peed: undefined;
-  Settings: undefined;
+  Search: undefined;
+  Upload: undefined;
+  Setting: undefined;
   UserDetail: {id: number; title: string};
   SignUp: undefined;
+  Login: undefined;
 };
 
 export const useNavi = () => {

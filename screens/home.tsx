@@ -1,8 +1,6 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import WrapperView from '@/components/wrapper-view';
-
 import PeedList from '@/screens/peed-list';
 import UserDetail from './user-detail';
 

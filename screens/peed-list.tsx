@@ -3,9 +3,12 @@ import React from 'react';
 import UserInfo from '@/components/user-info';
 import {arr} from '../mok';
 import Peed from '@/components/peed';
-import WrapperView from '@/components/wrapper-view';
+import useHealth from '@/hooks/useHealth';
 
 const PeedList = () => {
+  const {data} = useHealth();
+
+  console.log(data);
   return (
     <SafeAreaView style={{flex: 1}}>
       <UserInfo />
