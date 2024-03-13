@@ -15,7 +15,7 @@ import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
 
 import {useBottomSheet} from '@/hooks/useBottomSheet';
 import {useNavi} from '@/hooks/useNavi';
-import useLogin from '@/hooks/use-login';
+import useLogin from '@/hooks/user/use-login';
 
 import {TERMS} from '../const';
 import {CheckIcon, RightArrow} from '../assets/icons';

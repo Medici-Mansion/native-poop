@@ -22,7 +22,6 @@ export interface SignupStepInfo {
   birth: string;
   gender: Gender;
   phone: string;
-  code: string;
   verify: Verify;
 }
 
@@ -45,12 +44,40 @@ export enum Verify {
 }
 
 export interface SignupParam {
+  nickname: string;
+  id: string;
+  password: string;
+  email: string;
+  birthday: string;
+  gender: string;
+  phone: string;
+}
+
+export interface VerifyParam {
   type: Verify;
-  vid: string | number;
+  vid: string;
 }
 
 export interface SuccessVerifyRes {
   id: string;
   accountId: string;
   birthday: string;
+}
+
+export interface SuccessSignupRes {
+  data: boolean;
+  error: ApiError;
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  error?: ApiError;
+}
+
+export interface ApiError {
+  statusCode: number;
+  timestamp: string;
+  path: string;
+  message: string[];
+  error: string;
 }

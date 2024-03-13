@@ -18,21 +18,25 @@ import {RadioButton} from 'react-native-paper';
 import DatePicker from 'react-native-date-picker';
 
 import {useNavi} from '@/hooks/useNavi';
-import useGetVerify from '../hooks/use-get-verify';
+import useGetVerify from '@/hooks/user/use-get-verify';
 import {SignupFormList} from '../const';
+import useSignup from '@/hooks/user/use-signup';
+import {Verify, VerifyParam} from '@/types';
 
 const SignUpScreen = () => {
   const {navigation} = useNavi();
-  const {mutate: verifyMutate} = useGetVerify();
+
   const [step, setStep] = useState(0);
   const [radioValue, setRadioValue] = useState('');
-  const [selectPhoneOrRadio, setSelectPhoneOrRadio] = useState('phone');
+  const [selectPhoneOrRadio, setSelectPhoneOrRadio] = useState<Verify>(
+    Verify.PHONE,
+  );
   const [birthFlag, setBirthFlag] = useState(false);
   const [picker, setPicker] = useState(false);
   const [date, setDate] = useState(new Date());
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [formValue, setFormValue] = useState({
-    name: '',
+    nickname: '',
     id: '',
     password: '',
     email: '',
@@ -41,19 +45,39 @@ const SignUpScreen = () => {
     phone: '',
   });
 
-  const onPressEditing = async (
-    callback: () => Promise<boolean>,
-    value: {[name: string]: string},
-  ) => {
-    const isValid = await callback();
-    if (!isValid) return;
+  const {mutate: verifyMutate, isSuccess: isVerifySuccess} = useGetVerify({
+    onSuccess(data, variables, context) {
+      console.log(data, '<<< code');
+    },
+  });
+  const {
+    mutate: signupMutate,
+    isSuccess: isSignupSuccess,
+    data: signupData,
+    error: signupError,
+  } = useSignup({
+    onSuccess(data, variables, context) {
+      variables.email;
+      verifyMutate({
+        type: selectPhoneOrRadio,
+        vid:
+          selectPhoneOrRadio === Verify.EMAIL
+            ? variables.email
+            : variables.phone,
+      });
+      data.data ? setStep(prev => prev + 1) : console.log(data);
+    },
+  });
 
+  const onPressEditing = async (value: {[key: string]: string}) => {
     setFormValue(prev => ({...prev, ...value}));
-    step !== 6 ? setStep(prev => prev + 1) : submit();
-  };
 
-  const submit = () => {
-    return;
+    const verifyParam: VerifyParam = {
+      type: selectPhoneOrRadio,
+      vid: selectPhoneOrRadio === 'PHONE' ? formValue.phone : formValue.email,
+    };
+
+    step < 5 && setStep(prev => prev + 1);
   };
 
   useEffect(() => {
@@ -70,9 +94,9 @@ const SignUpScreen = () => {
     };
   }, []);
 
-  console.log(formValue, '<<<<<<');
-  console.log(step, '<<< step');
-
+  console.log(signupError?.response?.data.error.message, '<<<<<<< signupError');
+  console.log(signupData?.data);
+  console.log(formValue, '<<<<<');
   return (
     <GestureHandlerRootView
       style={{
@@ -107,9 +131,6 @@ const SignUpScreen = () => {
                             placeholderTextColor={'#5D5D5D'}
                             keyboardType="number-pad"
                             className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
-                            onSubmitEditing={() =>
-                              onPressEditing(submit, {id: value})
-                            }
                           />
                           {errors.map(error => (
                             <Text key={error} className="text-white mt-3 ml-3">
@@ -125,8 +146,14 @@ const SignUpScreen = () => {
             </Form>
           )}
           {step >= 5 && (
-            <Form>
-              {({submit}) => (
+            <Form
+              onSubmit={vid => {
+                signupMutate({
+                  ...formValue,
+                  ...vid,
+                });
+              }}>
+              {({submit, isValid, reset}) => (
                 <View>
                   {step > 5 && (
                     <Text className="text-[#5D5D5D]">
@@ -134,49 +161,57 @@ const SignUpScreen = () => {
                     </Text>
                   )}
                   <RadioButton.Group
-                    onValueChange={value => {
-                      setSelectPhoneOrRadio(value);
+                    onValueChange={(value: string) => {
+                      const enumValue = value as Verify;
+                      setSelectPhoneOrRadio(enumValue);
                     }}
                     value={selectPhoneOrRadio}>
                     <View className="flex flex-row gap-14 py-5">
                       <View className="flex items-center">
                         <Text className="text-white">휴대폰</Text>
-                        <RadioButton value="phone" color="white" />
+                        <RadioButton value="PHONE" color="white" />
                       </View>
                       <View className="flex items-center">
                         <Text className="text-white">이메일</Text>
-                        <RadioButton value="email" color="white" />
+                        <RadioButton value="EMAIL" color="white" />
                       </View>
                     </View>
                   </RadioButton.Group>
                   <Field
-                    name={SignupFormList[3].name}
-                    onBlurValidate={z.string()}>
+                    name={selectPhoneOrRadio === 'PHONE' ? 'phone' : 'email'}>
                     {({value, setValue, onBlur, errors}) => {
                       return (
-                        <View>
-                          <TextInput
-                            value={value}
-                            onBlur={onBlur}
-                            onChangeText={text => setValue(text)}
-                            keyboardType={
-                              selectPhoneOrRadio === 'phone'
-                                ? 'phone-pad'
-                                : 'email-address'
-                            }
-                            className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
-                            placeholder={
-                              selectPhoneOrRadio === 'phone'
-                                ? '휴대폰 번호'
-                                : '이메일'
-                            }
-                            placeholderTextColor={'#5D5D5D'}
-                            onSubmitEditing={() => {
-                              selectPhoneOrRadio
-                                ? onPressEditing(submit, {phone: value})
-                                : onPressEditing(submit, {email: value});
-                            }}
-                          />
+                        <View className="py-4">
+                          {selectPhoneOrRadio === 'PHONE' ? (
+                            <TextInput
+                              key={'PHONE'}
+                              value={value}
+                              onBlur={() => {
+                                onBlur();
+                                isValid && submit();
+                              }}
+                              onChangeText={setValue}
+                              keyboardType={'phone-pad'}
+                              className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
+                              placeholder={'휴대폰 번호'}
+                              placeholderTextColor={'#5D5D5D'}
+                            />
+                          ) : (
+                            <TextInput
+                              key={'EMAIL'}
+                              value={value}
+                              onBlur={() => {
+                                onBlur();
+                                isValid && submit();
+                              }}
+                              onChangeText={setValue}
+                              keyboardType={'email-address'}
+                              className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
+                              placeholder={'이메일'}
+                              placeholderTextColor={'#5D5D5D'}
+                            />
+                          )}
+
                           {errors.map(error => (
                             <Text key={error} className="text-white mt-3 ml-3">
                               {error}
@@ -245,7 +280,10 @@ const SignUpScreen = () => {
                                 ? dayjs(date).format('YYYY-MM-DD')
                                 : SignupFormList[3].placeholder
                             }
-                            onBlur={onBlur}
+                            onBlur={() => {
+                              onBlur();
+                              isValid && submit();
+                            }}
                             editable={false}
                             onChangeText={text => setValue(text)}
                             placeholder={SignupFormList[3].placeholder}
@@ -268,7 +306,7 @@ const SignUpScreen = () => {
             </Form>
           )}
           {step >= 2 && (
-            <Form>
+            <Form onSubmit={onPressEditing}>
               {({isValid, submit}) => (
                 <View>
                   {step > 2 && (
@@ -290,15 +328,15 @@ const SignUpScreen = () => {
                         <View className="py-6">
                           <TextInput
                             value={value}
-                            onBlur={onBlur}
+                            onBlur={() => {
+                              onBlur();
+                              isValid && submit();
+                            }}
                             secureTextEntry
                             onChangeText={text => setValue(text)}
                             placeholder={SignupFormList[2].placeholder}
                             placeholderTextColor={'#5D5D5D'}
                             className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
-                            onSubmitEditing={() =>
-                              onPressEditing(submit, {password: value})
-                            }
                           />
                           {errors.map(error => (
                             <Text key={error} className="text-white mt-3 ml-3">
@@ -314,7 +352,7 @@ const SignUpScreen = () => {
             </Form>
           )}
           {step >= 1 && (
-            <Form>
+            <Form onSubmit={onPressEditing}>
               {({isValid, submit}) => (
                 <View>
                   {step > 1 && (
@@ -323,7 +361,7 @@ const SignUpScreen = () => {
                     </Text>
                   )}
                   <Field
-                    name={SignupFormList[0].name}
+                    name={SignupFormList[1].name}
                     onBlurValidate={z.string({
                       required_error: '아이디를 입력해주세요!',
                     })}>
@@ -332,14 +370,14 @@ const SignUpScreen = () => {
                         <View className="py-6">
                           <TextInput
                             value={value}
-                            onBlur={onBlur}
                             onChangeText={text => setValue(text)}
                             placeholder={SignupFormList[1].placeholder}
                             placeholderTextColor={'#5D5D5D'}
                             className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
-                            onSubmitEditing={() =>
-                              onPressEditing(submit, {id: value})
-                            }
+                            onBlur={() => {
+                              onBlur();
+                              isValid && submit();
+                            }}
                           />
                           {errors.map(error => (
                             <Text key={error} className="text-white mt-3 ml-3">
@@ -355,7 +393,7 @@ const SignUpScreen = () => {
             </Form>
           )}
           {step >= 0 && (
-            <Form>
+            <Form onSubmit={onPressEditing}>
               {({isValid, submit}) => (
                 <View>
                   {step > 0 && (
@@ -377,14 +415,14 @@ const SignUpScreen = () => {
                         <View className="py-4">
                           <TextInput
                             value={value}
-                            onBlur={onBlur}
+                            onBlur={() => {
+                              onBlur();
+                              isValid && submit();
+                            }}
                             onChangeText={text => setValue(text)}
                             placeholder={SignupFormList[0].placeholder}
                             placeholderTextColor={'#5D5D5D'}
                             className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
-                            onSubmitEditing={() =>
-                              onPressEditing(submit, {name: value})
-                            }
                           />
                           {errors.map(error => (
                             <Text
@@ -417,7 +455,7 @@ const SignUpScreen = () => {
               }
             }}>
             <Text className="text-center font-bold text-black">
-              {step === 6 ? '인증번호 요청' : '확인'}
+              {step === 5 ? '인증번호 요청' : '확인'}
             </Text>
           </Pressable>
         </KeyboardAvoidingView>

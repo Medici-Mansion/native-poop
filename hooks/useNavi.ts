@@ -9,6 +9,7 @@ type RootStackParam = {
   UserDetail: {id: number; title: string};
   SignUp: undefined;
   Login: undefined;
+  CreateProfile: undefined;
 };
 
 export const useNavi = () => {

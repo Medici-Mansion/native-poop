@@ -1,6 +1,6 @@
 import {useMutation} from '@tanstack/react-query';
-import LoginAPIs from '../apis/login/index';
-import {LoginParam, SuccessLoginRes} from '../types';
+import LoginAPIs from '../../apis/login/index';
+import {LoginParam, SuccessLoginRes} from '../../types';
 import {AxiosError} from 'axios';
 
 const useLogin = () => {

@@ -19,37 +19,37 @@ export const SignupFormList: SignupForm[] = [
   {
     id: 1,
     placeholder: '이름',
-    name: '',
+    name: 'nickname',
     title: '이름을 입력해주세요',
   },
   {
     id: 2,
     placeholder: '아이디',
-    name: '',
+    name: 'id',
     title: '아이디를 입력해주세요',
   },
   {
     id: 3,
     placeholder: '비밀번호',
-    name: '',
+    name: 'password',
     title: '비밀번호를 입력해주세요',
   },
   {
     id: 4,
     placeholder: '생년월일',
-    name: '',
+    name: 'birthday',
     title: '생년월일을 입력해주세요',
   },
   {
     id: 5,
     placeholder: '성별',
-    name: '',
+    name: 'gender',
     title: '성별을 선택해주세요',
   },
   {
     id: 6,
     placeholder: '휴대폰 번호',
-    name: '',
+    name: 'phone',
     title: '휴대폰 번호 또는 이메일을\n입력해주세요',
   },
   {
