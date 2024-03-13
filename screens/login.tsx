@@ -11,16 +11,17 @@ import {
 } from 'react-native';
 import {Controller, useForm} from 'react-hook-form';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import BottomSheet, {
-  BottomSheetView,
-  TouchableOpacity,
-} from '@gorhom/bottom-sheet';
+import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
 
 import {useBottomSheet} from '@/hooks/useBottomSheet';
 import {useNavi} from '@/hooks/useNavi';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import useLogin from '@/hooks/use-login';
+
+import {TERMS} from '../const';
+import {CheckIcon, RightArrow} from '../assets/icons';
 
 const LoginScreen = () => {
+  const {mutate, data, isSuccess} = useLogin();
   const [visible, setVisible] = useState(true);
   const {hideBottomSheet, ref, showBottomSheet, snapPoints} = useBottomSheet();
 
@@ -35,6 +36,11 @@ const LoginScreen = () => {
       password: '',
     },
   });
+
+  const submit = async (data: {id: string; password: string}) => {
+    Keyboard.dismiss();
+    await mutate(data);
+  };
 
   return (
     <GestureHandlerRootView style={styles.container}>
@@ -84,14 +90,14 @@ const LoginScreen = () => {
             />
           )}
         />
-        <Pressable>
-          <View className="rounded-2xl bg-white py-4">
-            <Text className="text-black text-center font-bold">로그인</Text>
-          </View>
-          <Text className="text-white text-center py-5 text-[12px] font-bold">
-            비밀번호를 잊으셨나요?
-          </Text>
+        <Pressable
+          className="rounded-2xl bg-white py-4"
+          onPress={handleSubmit(submit)}>
+          <Text className="text-black text-center font-bold">로그인</Text>
         </Pressable>
+        <Text className="text-white text-center py-5 text-[12px] font-bold">
+          비밀번호를 잊으셨나요?
+        </Text>
       </View>
       {visible && (
         <Pressable onPress={showBottomSheet} className="px-4">
@@ -100,6 +106,7 @@ const LoginScreen = () => {
           </View>
         </Pressable>
       )}
+
       <BottomSheet
         ref={ref}
         index={-1}
@@ -108,11 +115,42 @@ const LoginScreen = () => {
         backgroundStyle={{backgroundColor: '#121212'}}
         handleIndicatorStyle={{backgroundColor: 'white'}}>
         <BottomSheetView>
-          <View className="px-4">
-            <View className="flex justify-center py-16">
+          <View className="px-4 space-y-2 flex flex-col justify-evenly h-full">
+            <View className="flex justify-center py-6 ">
               <Text className="text-white font-bold text-[18px]">
                 풉을 시작하려면 동의가 필요해요
               </Text>
+            </View>
+            <View className="space-y-6">
+              {TERMS.map(item => {
+                return (
+                  <View
+                    className="pt-2 flex flex-row justify-between items-center"
+                    key={item.id}>
+                    <View className="flex flex-row items-center">
+                      <CheckIcon />
+                      <Text className="text-white ml-2 text-[12px]">
+                        {item.title}
+                      </Text>
+                    </View>
+                    <Pressable className="pr-2">
+                      <RightArrow />
+                    </Pressable>
+                  </View>
+                );
+              })}
+            </View>
+            <View className="pb-3">
+              <Pressable
+                className="bg-white py-3 rounded-2xl flex items-center justify-center"
+                onPress={() => {
+                  navigation.navigate('SignUp');
+                  hideBottomSheet();
+                }}>
+                <Text className="text-black font-bold text-center">
+                  동의하고 계속
+                </Text>
+              </Pressable>
             </View>
           </View>
         </BottomSheetView>
@@ -124,7 +162,6 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     backgroundColor: '#000000',
   },
   logoWrapper: {

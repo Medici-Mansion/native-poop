@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {LoginParam, SuccessLoginRes} from '../types';
 
 const healthCheck = async () => {
   const res = await axios.get(
@@ -7,13 +8,7 @@ const healthCheck = async () => {
   return res.data;
 };
 
-const getPeed = async () => {
-  const res = await axios.get('http://172.30.1.254/posts');
-  return res.data;
-};
-
 const APIs = {
-  getPeed,
   healthCheck,
 };
 
