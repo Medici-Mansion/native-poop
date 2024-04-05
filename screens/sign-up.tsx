@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import {z} from 'zod';
+import { z } from 'zod';
 import {
   Pressable,
   Text,
@@ -10,22 +10,22 @@ import {
   Dimensions,
   Keyboard,
 } from 'react-native';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {Field, Form} from 'houseform';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {BackHandler} from '@/assets/icons';
-import {RadioButton} from 'react-native-paper';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Field, Form } from 'houseform';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { BackHandler } from '@/assets/icons';
+import { RadioButton } from 'react-native-paper';
 import DatePicker from 'react-native-date-picker';
 
-import {useNavi} from '@/hooks/useNavi';
+import { useNavi } from '@/hooks/useNavi';
 import useGetVerifyCode from '@/hooks/user/use-get-verify-code';
-import {SignupFormList} from '../const';
+import { SignupFormList } from '../const';
 import useSignup from '@/hooks/user/use-signup';
-import {Verify, VerifyCheckParam} from '@/types';
+import { Verify, VerifyCheckParam } from '@/types';
 import useVerify from '@/hooks/user/use-verify';
 
 const SignUpScreen = () => {
-  const {navigation} = useNavi();
+  const { navigation } = useNavi();
 
   const [step, setStep] = useState(0);
   const [radioValue, setRadioValue] = useState('');
@@ -47,7 +47,7 @@ const SignUpScreen = () => {
     code: '',
   });
 
-  const {mutate: getVerifyCodeMutate, isSuccess: isVerifySuccess} =
+  const { mutate: getVerifyCodeMutate, isSuccess: isVerifySuccess } =
     useGetVerifyCode({
       onSuccess(data, variables, context) {
         console.log(data, '<<< code');
@@ -86,8 +86,8 @@ const SignUpScreen = () => {
     },
   });
 
-  const onPressEditing = async (value: {[key: string]: string}) => {
-    setFormValue(prev => ({...prev, ...value}));
+  const onPressEditing = async (value: { [key: string]: string }) => {
+    setFormValue(prev => ({ ...prev, ...value }));
     const verifyParam: VerifyCheckParam = {
       type: selectPhoneOrRadio,
       vid: selectPhoneOrRadio === 'PHONE' ? formValue.phone : formValue.email,
@@ -132,12 +132,12 @@ const SignUpScreen = () => {
           {step === 6 && (
             <Form
               onSubmit={code => {
-                setFormValue(prev => ({...prev, ...code}));
+                setFormValue(prev => ({ ...prev, ...code }));
               }}>
-              {({isValid, submit}) => (
+              {({ isValid, submit }) => (
                 <View>
                   <Field name={SignupFormList[6].name}>
-                    {({value, setValue, onBlur, errors}) => {
+                    {({ value, setValue, onBlur, errors }) => {
                       return (
                         <View className="py-6">
                           <TextInput
@@ -172,9 +172,9 @@ const SignUpScreen = () => {
                   ...formValue,
                   ...vid,
                 });
-                setFormValue(prev => ({...prev, ...vid}));
+                setFormValue(prev => ({ ...prev, ...vid }));
               }}>
-              {({submit, isValid, reset}) => (
+              {({ submit, isValid, reset }) => (
                 <View>
                   {step > 5 && (
                     <Text className="text-[#5D5D5D]">
@@ -200,7 +200,7 @@ const SignUpScreen = () => {
                   </RadioButton.Group>
                   <Field
                     name={selectPhoneOrRadio === 'PHONE' ? 'phone' : 'email'}>
-                    {({value, setValue, onBlur, errors}) => {
+                    {({ value, setValue, onBlur, errors }) => {
                       return (
                         <View className="py-4">
                           {selectPhoneOrRadio === 'PHONE' ? (
@@ -258,7 +258,7 @@ const SignUpScreen = () => {
               <RadioButton.Group
                 onValueChange={value => {
                   setRadioValue(value);
-                  setFormValue(prev => ({...prev, gender: value}));
+                  setFormValue(prev => ({ ...prev, gender: value }));
                   setStep(prev => prev + 1);
                 }}
                 value={radioValue}>
@@ -281,7 +281,7 @@ const SignUpScreen = () => {
           )}
           {step >= 3 && (
             <Form>
-              {({isValid, submit}) => (
+              {({ isValid, submit }) => (
                 <View>
                   {step > 3 && (
                     <Text className="text-[#5D5D5D]">
@@ -291,7 +291,7 @@ const SignUpScreen = () => {
                   <Field
                     name={SignupFormList[3].name}
                     onBlurValidate={z.string()}>
-                    {({value, setValue, onBlur, errors}) => {
+                    {({ value, setValue, onBlur, errors }) => {
                       return (
                         <Pressable
                           className="py-6"
@@ -330,7 +330,7 @@ const SignUpScreen = () => {
           )}
           {step >= 2 && (
             <Form onSubmit={onPressEditing}>
-              {({isValid, submit}) => (
+              {({ isValid, submit }) => (
                 <View>
                   {step > 2 && (
                     <Text className="text-[#5D5D5D]">
@@ -346,7 +346,7 @@ const SignUpScreen = () => {
                       .min(6, {
                         message: '6글자 이상을 입력해주세요',
                       })}>
-                    {({value, setValue, onBlur, errors}) => {
+                    {({ value, setValue, onBlur, errors }) => {
                       return (
                         <View className="py-6">
                           <TextInput
@@ -376,7 +376,7 @@ const SignUpScreen = () => {
           )}
           {step >= 1 && (
             <Form onSubmit={onPressEditing}>
-              {({isValid, submit}) => (
+              {({ isValid, submit }) => (
                 <View>
                   {step > 1 && (
                     <Text className="text-[#5D5D5D]">
@@ -388,7 +388,7 @@ const SignUpScreen = () => {
                     onBlurValidate={z.string({
                       required_error: '아이디를 입력해주세요!',
                     })}>
-                    {({value, setValue, onBlur, errors}) => {
+                    {({ value, setValue, onBlur, errors }) => {
                       return (
                         <View className="py-6">
                           <TextInput
@@ -417,7 +417,7 @@ const SignUpScreen = () => {
           )}
           {step >= 0 && (
             <Form onSubmit={onPressEditing}>
-              {({isValid, submit}) => (
+              {({ isValid, submit }) => (
                 <View>
                   {step > 0 && (
                     <Text className="text-[#5D5D5D]">
@@ -433,7 +433,7 @@ const SignUpScreen = () => {
                       .min(5, {
                         message: '5글자 이상을 입력해주세요',
                       })}>
-                    {({value, setValue, onBlur, errors}) => {
+                    {({ value, setValue, onBlur, errors }) => {
                       return (
                         <View className="py-4">
                           <TextInput

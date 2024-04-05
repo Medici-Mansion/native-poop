@@ -1,11 +1,8 @@
-import axios from 'axios';
-import {LoginParam, SuccessLoginRes} from '../../types/index';
+import { LoginParam, SuccessLoginRes } from '../../types/index';
+import { api } from '..';
 
 const login = async (param: LoginParam) => {
-  const res = await axios.post<SuccessLoginRes>(
-    'https://poop-server-u2f55.ondigitalocean.app/api/v1/auth/login',
-    param,
-  );
+  const res = await api.post<SuccessLoginRes>('/v1/auth/login', param);
   return res.data;
 };
 

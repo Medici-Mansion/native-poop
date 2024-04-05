@@ -1,12 +1,12 @@
-import React, {useEffect} from 'react';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import React, { useEffect } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SplashScreen from 'react-native-splash-screen';
-import {useUserStore} from '@/store/user-store';
+import { useUserStore } from '@/store/user-store';
 import ReactQueryProvider from '@/provider/react-query.provider';
-import {PaperProvider} from 'react-native-paper';
+import { PaperProvider } from 'react-native-paper';
 
 import HomeScreen from '@/screens/home';
 import UploadScreen from '@/screens/upload';
@@ -28,14 +28,14 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function App(): JSX.Element {
-  const {isLogin} = useUserStore();
+  const { isLogin } = useUserStore();
 
   useEffect(() => {
     SplashScreen.hide();
   }, []);
 
   return (
-    <SafeAreaProvider style={{flex: 1}}>
+    <SafeAreaProvider style={{ flex: 1 }}>
       <ReactQueryProvider>
         <PaperProvider>
           <NavigationContainer>
@@ -45,7 +45,7 @@ function App(): JSX.Element {
                 screenOptions={{
                   headerShown: false,
                   tabBarShowLabel: false,
-                  tabBarStyle: {backgroundColor: 'black'},
+                  tabBarStyle: { backgroundColor: 'black' },
                   tabBarActiveTintColor: 'black',
                 }}>
                 <Tab.Screen
@@ -90,7 +90,7 @@ function App(): JSX.Element {
                 />
               </Tab.Navigator>
             ) : (
-              <Stack.Navigator screenOptions={{headerShown: false}}>
+              <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="SignUp" component={SignUp} />
               </Stack.Navigator>

@@ -11,6 +11,12 @@ const useLogin = () => {
   >({
     mutationKey: ['login'],
     mutationFn: (param: LoginParam) => LoginAPIs.login(param),
+    onSuccess(data, variables, context) {
+      console.log('SUCCESS', data);
+    },
+    onError(error, variables, context) {
+      console.log(error, 'error');
+    },
   });
 
   return {

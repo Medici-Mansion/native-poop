@@ -39,7 +39,7 @@ const LoginScreen = () => {
 
   const submit = async (data: {id: string; password: string}) => {
     Keyboard.dismiss();
-    await mutate(data);
+    mutate(data);
   };
 
   return (
