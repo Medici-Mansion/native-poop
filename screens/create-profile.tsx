@@ -12,7 +12,7 @@ const CreateProfile = () => {
         paddingHorizontal: 12,
       }}>
       <View
-        className="flex flex-row justify-between items-center"
+        className="flex flex-row justify-between items-center py-3"
         style={{ flex: 1 }}>
         <Pressable>
           <CloseIcon size={25} />
