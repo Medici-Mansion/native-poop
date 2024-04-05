@@ -64,13 +64,18 @@ export interface VerifyCheckParam {
   vid: string;
 }
 
-export interface SuccessVerifyRes {
+export interface SuccessGetVerifyCodeRes {
   id: string;
   accountId: string;
   birthday: string;
 }
 
 export interface SuccessSignupRes {
+  data: boolean;
+  error: ApiError;
+}
+
+export interface SuccessVerifyRes {
   data: boolean;
   error: ApiError;
 }

@@ -14,6 +14,7 @@ import LoginScreen from '@/screens/login';
 import Settings from '@/screens/settings';
 import SearchScreen from '@/screens/search';
 import SignUp from '@/screens/sign-up';
+import SuccessSignup from '@/screens/success-signup';
 
 import {
   HomeTabIcon,
@@ -22,7 +23,8 @@ import {
   SearchIcon,
   SettingIcon,
 } from '@/assets/icons';
-import ListScreen from './screens/list';
+import ListScreen from '@/screens/list';
+import CreateProfile from '@/screens/create-profile';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -93,6 +95,8 @@ function App(): JSX.Element {
               <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="SignUp" component={SignUp} />
+                <Stack.Screen name="SuccessSignup" component={SuccessSignup} />
+                <Stack.Screen name="CreateProfile" component={CreateProfile} />
               </Stack.Navigator>
             )}
           </NavigationContainer>

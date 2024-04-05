@@ -20,15 +20,12 @@ const getVerifyCode = async (param: VerifyParam) => {
 };
 
 const verify = async (param: VerifyCheckParam) => {
-  const res = await axios.post(
-    'https://poop-server-u2f55.ondigitalocean.app/api/v1/auth/verify',
-    param,
-  );
+  const res = await api.post('/v1/auth/verify', param);
   return res.data;
 };
 
 const signup = async (param: SignupParam) => {
-  const res = await axios.put<ApiResponse<SuccessSignupRes>>(
+  const res = await api.put<ApiResponse<SuccessSignupRes>>(
     '/v1/auth/signup',
     param,
   );

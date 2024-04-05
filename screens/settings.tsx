@@ -1,6 +1,6 @@
-import {Pressable, Text, Dimensions} from 'react-native';
+import { Pressable, Text, Dimensions } from 'react-native';
 import WrapperView from '@/components/wrapper-view';
-import {useUserStore} from '@/store/user-store';
+import { useUserStore } from '@/store/user-store';
 import {
   Canvas,
   Blur,
@@ -9,7 +9,7 @@ import {
 } from '@shopify/react-native-skia';
 
 const Settings = () => {
-  const {logout} = useUserStore();
+  const { logout } = useUserStore();
   const windowWidth = Dimensions.get('window').width;
 
   const dog = useAnimatedImageValue(require('../assets/images/profile.png'));
@@ -17,7 +17,8 @@ const Settings = () => {
     <WrapperView>
       <Pressable
         className="bg-[#191919] items-center"
-        style={{flex: 1, display: 'flex', justifyContent: 'center'}}>
+        style={{ flex: 1, display: 'flex', justifyContent: 'center' }}
+        onPress={logout}>
         <Text className="text-white">Logout</Text>
       </Pressable>
       <Canvas

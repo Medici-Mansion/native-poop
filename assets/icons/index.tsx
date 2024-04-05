@@ -1,4 +1,4 @@
-import {Image} from 'react-native';
+import { Image } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -14,7 +14,9 @@ export const UploadIcon = () => (
 );
 export const CheckIcon = () => <Icon name="check" size={16} color="white" />;
 
-export const CloseIcon = () => <Icon name="close" size={20} color={'white'} />;
+export const CloseIcon = ({ size = 20, color = 'white' }) => (
+  <Icon name="close" size={size} color={color} />
+);
 
 /**
  *
@@ -51,7 +53,7 @@ export const HomeTabIcon = () => (
   <MaterialIcon name="home-variant" size={20} color="white" />
 );
 
-export const GenderIcon = ({gender}: {gender: boolean}) => (
+export const GenderIcon = ({ gender }: { gender: boolean }) => (
   <MaterialIcon
     name={gender ? 'gender-female' : 'gender-male'}
     size={16}
@@ -68,7 +70,7 @@ export const GenderIcon = ({gender}: {gender: boolean}) => (
 export const LogoImage = () => (
   <Image
     source={require('../images/logo.png')}
-    style={{width: 100, height: 100}}
+    style={{ width: 100, height: 100 }}
   />
 );
 
@@ -79,13 +81,20 @@ export const PlusIcon = () => (
 export const SettingIcon = () => (
   <Image
     source={require('../images/setting.png')}
-    style={{width: 20, height: 20}}
+    style={{ width: 20, height: 20 }}
   />
 );
 
 export const ListIcon = () => (
   <Image
     source={require('../images/list.png')}
-    style={{width: 20, height: 20}}
+    style={{ width: 20, height: 20 }}
+  />
+);
+
+export const PhotoIcon = () => (
+  <Image
+    source={require('../images/photo.png')}
+    style={{ width: 20, height: 20 }}
   />
 );

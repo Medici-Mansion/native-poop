@@ -54,16 +54,13 @@ const SignUpScreen = () => {
       },
     });
 
-  const {
-    mutate: verifyMutate,
-    isSuccess: verifySuccess,
-    isPending,
-  } = useVerify({
-    onSuccess: data => {
-      console.log(data, '<<<<<< successData');
+  const { mutate: verifyMutate } = useVerify({
+    onSuccess(response) {
+      const { data, error } = response || {};
+      if (data) navigation.push('SuccessSignup');
     },
     onError: err => {
-      console.log(err);
+      console.log(err, '<<<<<< verify error');
     },
   });
 
@@ -88,17 +85,9 @@ const SignUpScreen = () => {
 
   const onPressEditing = async (value: { [key: string]: string }) => {
     setFormValue(prev => ({ ...prev, ...value }));
-    const verifyParam: VerifyCheckParam = {
-      type: selectPhoneOrRadio,
-      vid: selectPhoneOrRadio === 'PHONE' ? formValue.phone : formValue.email,
-      code: formValue.code,
-    };
-
-    console.log(verifyParam, '<<<<');
-    step <= 5 ? setStep(prev => prev + 1) : verifyMutate(verifyParam);
+    step <= 5 && setStep(prev => prev + 1);
   };
 
-  console.log(step, '<<<<<');
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
       setKeyboardVisible(true);
@@ -112,6 +101,17 @@ const SignUpScreen = () => {
       hideSubscription.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (formValue.code) {
+      const verifyParam: VerifyCheckParam = {
+        type: selectPhoneOrRadio,
+        vid: selectPhoneOrRadio === 'PHONE' ? formValue.phone : formValue.email,
+        code: formValue.code,
+      };
+      verifyMutate(verifyParam);
+    }
+  }, [formValue.code]);
 
   console.log(formValue);
 
