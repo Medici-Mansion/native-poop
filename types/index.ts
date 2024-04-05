@@ -58,6 +58,12 @@ export interface VerifyParam {
   vid: string;
 }
 
+export interface VerifyCheckParam {
+  code: string;
+  type: Verify;
+  vid: string;
+}
+
 export interface SuccessVerifyRes {
   id: string;
   accountId: string;

@@ -55,7 +55,7 @@ export const SignupFormList: SignupForm[] = [
   {
     id: 7,
     placeholder: '인증 번호',
-    name: '',
+    name: 'code',
     title: '인증 번호를 입력해주세요',
   },
 ];

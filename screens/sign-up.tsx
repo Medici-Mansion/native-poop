@@ -18,10 +18,11 @@ import {RadioButton} from 'react-native-paper';
 import DatePicker from 'react-native-date-picker';
 
 import {useNavi} from '@/hooks/useNavi';
-import useGetVerify from '@/hooks/user/use-get-verify';
+import useGetVerifyCode from '@/hooks/user/use-get-verify-code';
 import {SignupFormList} from '../const';
 import useSignup from '@/hooks/user/use-signup';
-import {Verify, VerifyParam} from '@/types';
+import {Verify, VerifyCheckParam} from '@/types';
+import useVerify from '@/hooks/user/use-verify';
 
 const SignUpScreen = () => {
   const {navigation} = useNavi();
@@ -43,22 +44,38 @@ const SignUpScreen = () => {
     birthday: '',
     gender: '',
     phone: '',
+    code: '',
   });
 
-  const {mutate: verifyMutate, isSuccess: isVerifySuccess} = useGetVerify({
-    onSuccess(data, variables, context) {
-      console.log(data, '<<< code');
+  const {mutate: getVerifyCodeMutate, isSuccess: isVerifySuccess} =
+    useGetVerifyCode({
+      onSuccess(data, variables, context) {
+        console.log(data, '<<< code');
+      },
+    });
+
+  const {
+    mutate: verifyMutate,
+    isSuccess: verifySuccess,
+    isPending,
+  } = useVerify({
+    onSuccess: data => {
+      console.log(data, '<<<<<< successData');
+    },
+    onError: err => {
+      console.log(err);
     },
   });
+
   const {
     mutate: signupMutate,
     isSuccess: isSignupSuccess,
     data: signupData,
     error: signupError,
   } = useSignup({
-    onSuccess(data, variables, context) {
+    onSuccess(data, variables) {
       variables.email;
-      verifyMutate({
+      getVerifyCodeMutate({
         type: selectPhoneOrRadio,
         vid:
           selectPhoneOrRadio === Verify.EMAIL
@@ -71,15 +88,17 @@ const SignUpScreen = () => {
 
   const onPressEditing = async (value: {[key: string]: string}) => {
     setFormValue(prev => ({...prev, ...value}));
-
-    const verifyParam: VerifyParam = {
+    const verifyParam: VerifyCheckParam = {
       type: selectPhoneOrRadio,
       vid: selectPhoneOrRadio === 'PHONE' ? formValue.phone : formValue.email,
+      code: formValue.code,
     };
 
-    step < 5 && setStep(prev => prev + 1);
+    console.log(verifyParam, '<<<<');
+    step <= 5 ? setStep(prev => prev + 1) : verifyMutate(verifyParam);
   };
 
+  console.log(step, '<<<<<');
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
       setKeyboardVisible(true);
@@ -94,9 +113,8 @@ const SignUpScreen = () => {
     };
   }, []);
 
-  console.log(signupError?.response?.data.error.message, '<<<<<<< signupError');
-  console.log(signupData?.data);
-  console.log(formValue, '<<<<<');
+  console.log(formValue);
+
   return (
     <GestureHandlerRootView
       style={{
@@ -112,20 +130,22 @@ const SignUpScreen = () => {
             {SignupFormList[step].title || ''}
           </Text>
           {step === 6 && (
-            <Form>
+            <Form
+              onSubmit={code => {
+                setFormValue(prev => ({...prev, ...code}));
+              }}>
               {({isValid, submit}) => (
                 <View>
-                  <Field
-                    name={SignupFormList[0].name}
-                    onBlurValidate={z.string({
-                      required_error: '아이디를 입력해주세요!',
-                    })}>
+                  <Field name={SignupFormList[6].name}>
                     {({value, setValue, onBlur, errors}) => {
                       return (
                         <View className="py-6">
                           <TextInput
                             value={value}
-                            onBlur={onBlur}
+                            onBlur={() => {
+                              onBlur();
+                              isValid && submit();
+                            }}
                             onChangeText={text => setValue(text)}
                             placeholder={SignupFormList[6].placeholder}
                             placeholderTextColor={'#5D5D5D'}
@@ -152,6 +172,7 @@ const SignUpScreen = () => {
                   ...formValue,
                   ...vid,
                 });
+                setFormValue(prev => ({...prev, ...vid}));
               }}>
               {({submit, isValid, reset}) => (
                 <View>
@@ -190,7 +211,8 @@ const SignUpScreen = () => {
                                 onBlur();
                                 isValid && submit();
                               }}
-                              onChangeText={setValue}
+                              onChangeText={text => setValue(text)}
+                              // onChangeText={text => console.log(text)}
                               keyboardType={'phone-pad'}
                               className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
                               placeholder={'휴대폰 번호'}
@@ -204,7 +226,8 @@ const SignUpScreen = () => {
                                 onBlur();
                                 isValid && submit();
                               }}
-                              onChangeText={setValue}
+                              onChangeText={text => setValue(text)}
+                              // onChangeText={text => console.log(text)}
                               keyboardType={'email-address'}
                               className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
                               placeholder={'이메일'}
