@@ -92,3 +92,8 @@ export interface ApiError {
   message: string[];
   error: string;
 }
+
+export interface Consonants {
+  id: number;
+  value: string;
+}

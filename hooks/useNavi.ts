@@ -1,7 +1,7 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-type RootStackParam = {
+export type RootStackParam = {
   Home: undefined;
   Search: undefined;
   Upload: undefined;
@@ -11,6 +11,8 @@ type RootStackParam = {
   Login: undefined;
   CreateProfile: undefined;
   SuccessSignup: undefined;
+  SelectPhoto: undefined;
+  SelectBreeds: undefined;
 };
 
 export const useNavi = () => {

@@ -1,4 +1,4 @@
-import {SignupForm} from '../types';
+import { Consonants, SignupForm } from '@/types';
 
 export const TERMS = [
   {
@@ -58,4 +58,21 @@ export const SignupFormList: SignupForm[] = [
     name: 'code',
     title: '인증 번호를 입력해주세요',
   },
+];
+
+export const consonantsList: Consonants[] = [
+  { id: 1, value: 'ㄱ' },
+  { id: 2, value: 'ㄴ' },
+  { id: 3, value: 'ㄷ' },
+  { id: 4, value: 'ㄹ' },
+  { id: 5, value: 'ㅁ' },
+  { id: 6, value: 'ㅂ' },
+  { id: 7, value: 'ㅅ' },
+  { id: 8, value: 'ㅇ' },
+  { id: 9, value: 'ㅈ' },
+  { id: 10, value: 'ㅊ' },
+  { id: 11, value: 'ㅋ' },
+  { id: 12, value: 'ㅌ' },
+  { id: 13, value: 'ㅍ' },
+  { id: 14, value: 'ㅎ' },
 ];

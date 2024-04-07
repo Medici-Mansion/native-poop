@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -9,27 +9,28 @@ import {
   TextInput,
   Keyboard,
 } from 'react-native';
-import {Controller, useForm} from 'react-hook-form';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
+import { Controller, useForm } from 'react-hook-form';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
-import {useBottomSheet} from '@/hooks/useBottomSheet';
-import {useNavi} from '@/hooks/useNavi';
+import { useBottomSheet } from '@/hooks/useBottomSheet';
+import { useNavi } from '@/hooks/useNavi';
 import useLogin from '@/hooks/user/use-login';
 
-import {TERMS} from '../const';
-import {CheckIcon, RightArrow} from '../assets/icons';
+import { TERMS } from '../const';
+import { CheckIcon, RightArrow } from '../assets/icons';
 
 const LoginScreen = () => {
-  const {mutate, data, isSuccess} = useLogin();
+  const { mutate, data, isSuccess } = useLogin();
   const [visible, setVisible] = useState(true);
-  const {hideBottomSheet, ref, showBottomSheet, snapPoints} = useBottomSheet();
+  const { hideBottomSheet, ref, showBottomSheet, snapPoints } =
+    useBottomSheet('50%');
 
-  const {navigation} = useNavi();
+  const { navigation } = useNavi();
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
   } = useForm({
     defaultValues: {
       id: '',
@@ -37,7 +38,7 @@ const LoginScreen = () => {
     },
   });
 
-  const submit = async (data: {id: string; password: string}) => {
+  const submit = async (data: { id: string; password: string }) => {
     Keyboard.dismiss();
     mutate(data);
   };
@@ -50,12 +51,12 @@ const LoginScreen = () => {
           style={styles.logoImage}
         />
       </Pressable>
-      <View style={{flex: 6}} className="flex px-4 space-y-4">
+      <View style={{ flex: 6 }} className="flex px-4 space-y-4">
         <Controller
           control={control}
-          rules={{required: true}}
+          rules={{ required: true }}
           name="id"
-          render={({field: {onChange, onBlur, value}}) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl bg-[#1C1C1C] text-[12px] mb-4"
               placeholder="아이디, 핸드폰 번호, 이메일"
@@ -72,9 +73,9 @@ const LoginScreen = () => {
         />
         <Controller
           control={control}
-          rules={{required: true}}
+          rules={{ required: true }}
           name="password"
-          render={({field: {onChange, onBlur, value}}) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl bg-[#1C1C1C] text-[12px]"
               placeholder="비밀번호"
@@ -112,8 +113,8 @@ const LoginScreen = () => {
         index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose={true}
-        backgroundStyle={{backgroundColor: '#121212'}}
-        handleIndicatorStyle={{backgroundColor: 'white'}}>
+        backgroundStyle={{ backgroundColor: '#121212' }}
+        handleIndicatorStyle={{ backgroundColor: 'white' }}>
         <BottomSheetView>
           <View className="px-4 space-y-2 flex flex-col justify-evenly h-full">
             <View className="flex justify-center py-6 ">

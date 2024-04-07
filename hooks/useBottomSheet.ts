@@ -1,7 +1,7 @@
 import BottomSheet from '@gorhom/bottom-sheet';
-import {useCallback, useMemo, useRef} from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
-export const useBottomSheet = () => {
+export const useBottomSheet = (snapPoint: string) => {
   const sheetRef = useRef<BottomSheet>(null);
 
   const handleSheetChange = useCallback(() => {
@@ -16,7 +16,7 @@ export const useBottomSheet = () => {
     sheetRef.current?.close();
   }, []);
 
-  const snapPoints = useMemo(() => ['50%'], []);
+  const snapPoints = useMemo(() => [snapPoint], []);
 
   return {
     ref: sheetRef,

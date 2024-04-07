@@ -35,8 +35,8 @@ export const RightArrow = () => (
   <IonicIcon name="chevron-forward" size={16} color={'#5D5D5D'} />
 );
 
-export const LeftArrow = () => (
-  <IonicIcon name="chevron-back-outline" size={16} color={'#5D5D5D'} />
+export const LeftArrow = ({ size = 20, color = 'white' }) => (
+  <IonicIcon name="chevron-back-outline" size={size} color={color} />
 );
 
 export const BackHandler = () => (
