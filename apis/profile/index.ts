@@ -1,14 +1,8 @@
 import { api } from '@/apis';
+import { BreedData } from '@/types';
 
-const getBreeds = async ({
-  limit = 10,
-  cursor = '',
-  order = 'ASC',
-  searchKey = '',
-}) => {
-  const res = await api.get(
-    `/v1/common/breeds?limit=${limit}&cursor=${cursor}&order=${order}&searchKey=${searchKey}`,
-  );
+const getBreeds = async () => {
+  const res = await api.get<BreedData>(`/v1/common/breeds`);
   return res.data;
 };
 

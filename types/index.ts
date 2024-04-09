@@ -1,3 +1,5 @@
+import { AxiosError } from 'axios';
+
 export interface Peeds {
   id: number;
   title: string;
@@ -96,4 +98,20 @@ export interface ApiError {
 export interface Consonants {
   id: number;
   value: string;
+}
+
+export interface Breed {
+  id: string;
+  name: string;
+  nameEN: string;
+  avatar: string;
+}
+
+export interface BreedsGroupedByConsonant {
+  [consonant: string]: Breed[];
+}
+
+export interface BreedData {
+  data: BreedsGroupedByConsonant;
+  error: AxiosError;
 }

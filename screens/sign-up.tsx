@@ -113,8 +113,6 @@ const SignUpScreen = () => {
     }
   }, [formValue.code]);
 
-  console.log(formValue);
-
   return (
     <GestureHandlerRootView
       style={{
@@ -212,7 +210,6 @@ const SignUpScreen = () => {
                                 isValid && submit();
                               }}
                               onChangeText={text => setValue(text)}
-                              // onChangeText={text => console.log(text)}
                               keyboardType={'phone-pad'}
                               className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
                               placeholder={'휴대폰 번호'}

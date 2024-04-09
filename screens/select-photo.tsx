@@ -28,16 +28,15 @@ const SelectPhoto = () => {
     getPhotos();
   }, []);
 
-  const renderItem = ({ item }: { item: PhotoIdentifier }) => (
-    <Image
-      style={{
-        width: '33%',
-        height: 120,
-        margin: 1,
-      }}
-      source={{ uri: item.node.image.uri }}
-    />
-  );
+  const renderItem = ({ item }: { item: PhotoIdentifier }) => {
+    return (
+      <Pressable
+        className="h-[120px] w-[33%] p-1"
+        onPress={() => console.log(item.node.image.uri)}>
+        <Image source={{ uri: item.node.image.uri }} style={{ height: 120 }} />
+      </Pressable>
+    );
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: 'black' }}>

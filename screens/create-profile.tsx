@@ -1,36 +1,60 @@
-import { Pressable, Text, TextInput, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { Dimensions, Pressable, Text, TextInput, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { CloseIcon, PhotoIcon } from '@/assets/icons';
-import { useNavi } from '@/hooks/useNavi';
-import { hasAndroidPermission } from '../permission/permission';
-import { Controller, useForm } from 'react-hook-form';
+import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
+import dayjs from 'dayjs';
 import DatePicker from 'react-native-date-picker';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { Field, Form } from 'houseform';
+import { ProfileFormList, consonantsList } from '../const';
+import { hasAndroidPermission } from '../permission/permission';
 
-import dayjs from 'dayjs';
+import { CloseIcon, PhotoIcon } from '@/assets/icons';
+import useProfileStore from '@/store/use-profile';
+import { useNavi } from '@/hooks/useNavi';
 import { useBottomSheet } from '@/hooks/useBottomSheet';
+import useGetBreedds from '@/hooks/useGetBreeds';
+import useDebounce from '@/hooks/useDebounce';
 import SearchBreeds from '@/components/select-breeds';
+import ConsonantCarousel from '@/components/consonant-carousel';
+
+const PAGE_WIDTH = 35;
+const PAGE_HEIGHT = 50;
 
 const CreateProfile = () => {
+  const r = useRef<ICarouselInstance>(null);
+  const { breed } = useProfileStore();
   const { navigation } = useNavi();
+  const width = Dimensions.get('window').width;
+  const [picker, setPicker] = useState(false);
+  const [isBreedsVisible, setIsBreedsVisible] = useState(false);
+  const [date, setDate] = useState(new Date());
+  const [searchKey, setSearchKey] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [birthFlag, setBirthFlag] = useState(false);
+  const searchValue = useDebounce(searchInput, 500);
+  const { data: breeds, isLoading } = useGetBreedds(searchKey, searchValue);
   const { hideBottomSheet, ref, showBottomSheet, snapPoints } =
     useBottomSheet('95%');
 
-  const [date, setDate] = useState(new Date());
-  const [picker, setPicker] = useState(false);
-  const [isBreedsVisible, setIsBreedsVisible] = useState(false);
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      name: '',
-      birthday: '',
-      breeds: '',
-    },
+  const [formValue, setFormValue] = useState({
+    name: '',
+    birthday: '',
   });
+
+  const submit = () => {
+    if (!formValue.birthday || !formValue.birthday || !breed.id) {
+      console.log('field required');
+      return;
+    }
+
+    const param = {
+      ...formValue,
+      breedId: breed.id || '',
+    };
+
+    console.log(param, '<<<<<< param');
+  };
 
   return (
     <GestureHandlerRootView
@@ -45,7 +69,9 @@ const CreateProfile = () => {
         <Pressable onPress={() => navigation.push('Login')}>
           <CloseIcon size={25} />
         </Pressable>
-        <Text className="text-[16px] text-[#959595]">등록</Text>
+        <Pressable onPress={submit}>
+          <Text className="text-[16px] text-[#959595]">등록</Text>
+        </Pressable>
       </View>
       <View className="flex items-center justify-center" style={{ flex: 2 }}>
         <Pressable
@@ -55,55 +81,84 @@ const CreateProfile = () => {
         </Pressable>
       </View>
       <View style={{ flex: 5, paddingVertical: 5 }} className="space-y-5">
+        <Form
+          onSubmit={name => {
+            setFormValue(prev => ({ ...prev, ...name }));
+          }}>
+          {({ isValid, submit }) => (
+            <View>
+              <Field name={ProfileFormList[0].name}>
+                {({ value, setValue, onBlur, errors }) => {
+                  return (
+                    <View className="py-6">
+                      <TextInput
+                        value={value}
+                        onBlur={() => {
+                          onBlur();
+                          isValid && submit();
+                        }}
+                        onChangeText={text => setValue(text)}
+                        placeholder={'이름'}
+                        placeholderTextColor={'#5D5D5D'}
+                        keyboardType="number-pad"
+                        className="rounded-xl bg-[#191919] text-white border-white px-6 py-3"
+                      />
+                      {errors.map(error => (
+                        <Text key={error} className="text-white mt-3 ml-3">
+                          {error}
+                        </Text>
+                      ))}
+                    </View>
+                  );
+                }}
+              </Field>
+            </View>
+          )}
+        </Form>
         <View>
-          <Controller
-            control={control}
-            rules={{ required: true }}
-            name="name"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View className="flex gap-y-3">
-                <Text className="text-[#959595] text-[12px]">반려견 이름</Text>
-                <TextInput
-                  className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl bg-[#1C1C1C] text-[12px]"
-                  placeholder="비밀번호"
-                  onChangeText={onChange}
-                  placeholderTextColor={'#5D5D5D'}
-                  onBlur={() => {
-                    onBlur();
+          <Form>
+            {({ isValid, submit }) => (
+              <View>
+                <Text className="text-[#5D5D5D]">
+                  {ProfileFormList[1].placeholder}
+                </Text>
+                <Field name={ProfileFormList[1].name}>
+                  {({ value, setValue, onBlur, errors }) => {
+                    return (
+                      <Pressable
+                        className="py-6"
+                        onPress={() => setPicker(true)}>
+                        <TextInput
+                          onPressIn={() => setPicker(true)}
+                          value={
+                            birthFlag
+                              ? dayjs(date).format('YYYY-MM-DD')
+                              : ProfileFormList[1].placeholder
+                          }
+                          onBlur={() => {
+                            onBlur();
+                            isValid && submit();
+                          }}
+                          editable={false}
+                          onChangeText={text => setValue(text)}
+                          placeholder={ProfileFormList[1].placeholder}
+                          placeholderTextColor={'#5D5D5D'}
+                          className={`rounded-xl bg-[#191919] border-white px-6 py-3 ${
+                            birthFlag ? 'text-white' : 'text-[#5D5D5D]'
+                          }`}
+                        />
+                        {errors.map(error => (
+                          <Text key={error} className="text-white mt-3 ml-3">
+                            {error}
+                          </Text>
+                        ))}
+                      </Pressable>
+                    );
                   }}
-                  value={value}
-                  secureTextEntry
-                />
+                </Field>
               </View>
             )}
-          />
-        </View>
-        <View>
-          <Controller
-            control={control}
-            rules={{ required: true }}
-            name="birthday"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Pressable
-                className="flex gap-y-3"
-                onPress={() => setPicker(true)}>
-                <Text className="text-[#959595] text-[12px]">
-                  반려견 생년월일
-                </Text>
-                <TextInput
-                  className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl bg-[#1C1C1C] text-[12px]"
-                  placeholder="생년월일"
-                  onChangeText={onChange}
-                  editable={false}
-                  placeholderTextColor={'#5D5D5D'}
-                  onBlur={() => {
-                    onBlur();
-                  }}
-                  value={value}
-                />
-              </Pressable>
-            )}
-          />
+          </Form>
         </View>
         <View>
           <Pressable
@@ -117,6 +172,7 @@ const CreateProfile = () => {
               className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl text-[12px]"
               placeholder="견종 선택"
               editable={false}
+              value={breed.name || ''}
               placeholderTextColor={'#5D5D5D'}
             />
           </Pressable>
@@ -127,6 +183,11 @@ const CreateProfile = () => {
           <Pressable
             onPress={() => {
               setPicker(false);
+              setBirthFlag(true);
+              setFormValue(prev => ({
+                ...prev,
+                birthday: dayjs(date).format('YYYY-MM-DD'),
+              }));
             }}>
             <Text className="bg-white text-black text-center py-3">확인</Text>
           </Pressable>
@@ -148,20 +209,57 @@ const CreateProfile = () => {
         </>
       )}
       {isBreedsVisible && (
-        <>
-          <BottomSheet
-            ref={ref}
-            index={-1}
-            snapPoints={snapPoints}
-            enablePanDownToClose={true}
-            style={{ flex: 1 }}
-            backgroundStyle={{ backgroundColor: '#121212' }}
-            handleIndicatorStyle={{ backgroundColor: 'white' }}>
-            <BottomSheetView>
-              <SearchBreeds />
-            </BottomSheetView>
-          </BottomSheet>
-        </>
+        <BottomSheet
+          ref={ref}
+          index={-1}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          backgroundStyle={{ backgroundColor: '#121212' }}
+          handleIndicatorStyle={{ backgroundColor: 'white' }}>
+          <BottomSheetView style={{ flex: 1 }}>
+            <View className="py-4">
+              <TextInput
+                className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl bg-[#1C1C1C] text-[12px]"
+                placeholder="검색어를 입력하세요"
+                placeholderTextColor={'#5D5D5D'}
+                onChangeText={text => setSearchInput(text)}
+              />
+              <Carousel
+                ref={r}
+                loop={false}
+                style={{
+                  width: width,
+                  height: PAGE_HEIGHT,
+                  alignItems: 'center',
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#1C1C1C',
+                }}
+                data={consonantsList}
+                width={PAGE_WIDTH}
+                height={PAGE_HEIGHT}
+                renderItem={({ item, animationValue }) => {
+                  return (
+                    <ConsonantCarousel
+                      animationValue={animationValue}
+                      label={item.value}
+                      onPress={() => {
+                        r.current?.scrollTo({
+                          count: animationValue.value,
+                          animated: true,
+                        });
+                        setSearchKey(item.value);
+                      }}
+                    />
+                  );
+                }}
+              />
+            </View>
+            <SearchBreeds
+              breeds={breeds || {}}
+              hideBottomSheet={hideBottomSheet}
+            />
+          </BottomSheetView>
+        </BottomSheet>
       )}
     </GestureHandlerRootView>
   );

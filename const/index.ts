@@ -60,6 +60,21 @@ export const SignupFormList: SignupForm[] = [
   },
 ];
 
+export const ProfileFormList: SignupForm[] = [
+  {
+    id: 1,
+    placeholder: '이름',
+    name: 'name',
+    title: '반려견 이름',
+  },
+  {
+    id: 2,
+    placeholder: '생년월일',
+    name: 'birthday',
+    title: '반려견 생년월일',
+  },
+];
+
 export const consonantsList: Consonants[] = [
   { id: 1, value: 'ㄱ' },
   { id: 2, value: 'ㄴ' },

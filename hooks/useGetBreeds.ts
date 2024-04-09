@@ -1,28 +1,56 @@
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import ProfileAPIs from '@/apis/profile';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { BreedData, BreedsGroupedByConsonant } from '@/types';
 
-const useGetChart = () => {
-  const { data, isLoading, isFetching, error, hasNextPage, fetchNextPage } =
-    useInfiniteQuery({
-      queryKey: ['breeds'],
-      queryFn: ({ pageParam }) => ProfileAPIs.getBreeds(),
-      initialPageParam: 1,
-      getNextPageParam: (lastPage, pages) => {
-        // if (isDetail && lastPage.next) {
-        //   return lastPage.next;
-        // }
-        return undefined;
-      },
-    });
+const useGetBreeds = (searchKey: string, searchInput: string) => {
+  console.log(searchInput);
+  const { data, isLoading, isFetching, error } = useQuery<
+    BreedData,
+    AxiosError,
+    BreedsGroupedByConsonant
+  >({
+    queryKey: ['breeds'],
+    queryFn: () => ProfileAPIs.getBreeds(),
+    staleTime: Infinity,
+    gcTime: Infinity,
+    select: data => {
+      const { data: breeds } = data || {};
+      if (!breeds) return {};
+
+      const filteredBreeds: BreedsGroupedByConsonant = {};
+
+      if (searchKey !== '') {
+        if (breeds[searchKey]) {
+          filteredBreeds[searchKey] = breeds[searchKey];
+        }
+        return filteredBreeds;
+      }
+
+      if (searchInput !== '') {
+        Object.keys(breeds).forEach(key => {
+          breeds[key].forEach(breed => {
+            if (
+              breed.nameEN.toLowerCase().includes(searchInput.toLowerCase())
+            ) {
+              if (!filteredBreeds[key]) filteredBreeds[key] = [];
+              filteredBreeds[key].push(breed);
+            }
+          });
+        });
+        return filteredBreeds;
+      }
+
+      return breeds;
+    },
+  });
 
   return {
     data,
     isLoading,
     isFetching,
     error,
-    hasNextPage,
-    fetchNextPage,
   };
 };
 
-export default useGetChart;
+export default useGetBreeds;
