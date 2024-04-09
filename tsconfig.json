@@ -12,7 +12,8 @@
       "@/apis/*": ["apis/*"],
       "@/store/*": ["store/*"],
       "@/assets/*": ["assets/*"],
-      "@/types/*": ["types/*"]
+      "@/types/*": ["types/*"],
+      "@/lib/*": ["lib/*"]
     }
   }
 }

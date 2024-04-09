@@ -1,5 +1,5 @@
 import { View, Text, Pressable, Image, FlatList } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { LeftArrow } from '@/assets/icons';
 import {
   CameraRoll,
@@ -7,9 +7,11 @@ import {
 } from '@react-native-camera-roll/camera-roll';
 import { useNavi } from '@/hooks/useNavi';
 import { useImageStore } from '@/store/use-image';
+import { getImageData } from '../lib/utils';
 
 const SelectPhoto = () => {
   const { navigation } = useNavi();
+  const [isPending, startTransition] = useTransition();
   const [photos, setPhotos] = useState<PhotoIdentifier[]>([]);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [nextCursor, setNextCursor] = useState('');
@@ -19,11 +21,18 @@ const SelectPhoto = () => {
     const { edges, page_info } = await CameraRoll.getPhotos({
       first: 10,
       assetType: 'Photos',
+      include: ['filename', 'fileSize', 'fileExtension', 'sourceType'],
     });
 
     setPhotos(prev => [...(prev ?? []), ...edges]);
     setHasNextPage(page_info.has_next_page);
     setNextCursor('');
+  };
+
+  const handleSelectImage = (item: PhotoIdentifier) => async () => {
+    const image = await getImageData(item.node.image);
+    setImage(image.uri);
+    navigation.pop();
   };
 
   useEffect(() => {
@@ -34,10 +43,7 @@ const SelectPhoto = () => {
     return (
       <Pressable
         className="h-[120px] w-[33%] p-1"
-        onPress={() => {
-          setImage(item.node.image.uri);
-          navigation.pop();
-        }}>
+        onPress={handleSelectImage(item)}>
         <Image source={{ uri: item.node.image.uri }} style={{ height: 120 }} />
       </Pressable>
     );

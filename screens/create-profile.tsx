@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -29,6 +29,7 @@ import useDebounce from '@/hooks/useDebounce';
 import SearchBreeds from '@/components/select-breeds';
 import ConsonantCarousel from '@/components/consonant-carousel';
 import { useImageStore } from '@/store/use-image';
+import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 
 const PAGE_WIDTH = 35;
 const PAGE_HEIGHT = 50;
@@ -68,6 +69,14 @@ const CreateProfile = () => {
     console.log(param, '<<<<<< param');
   };
 
+  useEffect(() => {
+    if (image) {
+      console.log(image, '<<<image');
+      CameraRoll.iosGetImageDataById(image).then(res => {
+        console.log(res);
+      });
+    }
+  }, [image]);
   return (
     <GestureHandlerRootView
       style={{

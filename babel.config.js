@@ -45,6 +45,7 @@ module.exports = api => {
             '@/store': './store',
             '@/assets': './assets',
             '@/types': './types',
+            '@/lib': './lib',
           },
         },
       ],
