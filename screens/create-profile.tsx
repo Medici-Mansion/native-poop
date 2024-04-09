@@ -46,7 +46,7 @@ const CreateProfile = () => {
   const [searchInput, setSearchInput] = useState('');
   const [birthFlag, setBirthFlag] = useState(false);
   const searchValue = useDebounce(searchInput, 500);
-  const { data: breeds, isLoading } = useGetBreedds(searchKey, searchValue);
+  const { data: breeds } = useGetBreedds(searchKey, searchValue);
   const { hideBottomSheet, ref, showBottomSheet, snapPoints } =
     useBottomSheet('95%');
   const { image } = useImageStore();
@@ -128,7 +128,7 @@ const CreateProfile = () => {
           onSubmit={name => {
             setFormValue(prev => ({ ...prev, ...name }));
           }}>
-          {({ isValid, submit }) => (
+          {({ isValid }) => (
             <View>
               <Field name={ProfileFormList[0].name}>
                 {({ value, setValue, onBlur, errors }) => {
@@ -160,13 +160,13 @@ const CreateProfile = () => {
         </Form>
         <View>
           <Form>
-            {({ isValid, submit }) => (
+            {({ isValid }) => (
               <View>
                 <Text className="text-[#5D5D5D]">
                   {ProfileFormList[1].placeholder}
                 </Text>
                 <Field name={ProfileFormList[1].name}>
-                  {({ value, setValue, onBlur, errors }) => {
+                  {({ setValue, onBlur, errors }) => {
                     return (
                       <Pressable
                         className="py-6"
@@ -241,9 +241,9 @@ const CreateProfile = () => {
             mode="date"
             androidVariant="iosClone"
             onDateChange={setDate}
-            onConfirm={date => {
+            onConfirm={newDate => {
               setPicker(false);
-              setDate(date);
+              setDate(newDate);
             }}
             onCancel={() => {
               setPicker(false);

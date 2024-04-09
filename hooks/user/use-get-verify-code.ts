@@ -1,7 +1,7 @@
-import {useMutation, type UseMutationOptions} from '@tanstack/react-query';
+import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 import SignupAPIs from '@/apis/signup';
-import {SuccessGetVerifyCodeRes, VerifyParam} from '@/types';
-import {AxiosError} from 'axios';
+import { SuccessGetVerifyCodeRes, VerifyParam } from '@/types';
+import { AxiosError } from 'axios';
 
 const useGetVerifyCode = (
   options?: UseMutationOptions<
@@ -10,7 +10,7 @@ const useGetVerifyCode = (
     VerifyParam
   >,
 ) => {
-  const {mutate, data, isSuccess, isPending, error} = useMutation<
+  const { mutate, data, isSuccess, isPending, error } = useMutation<
     SuccessGetVerifyCodeRes,
     AxiosError,
     VerifyParam

@@ -47,16 +47,15 @@ const SignUpScreen = () => {
     code: '',
   });
 
-  const { mutate: getVerifyCodeMutate, isSuccess: isVerifySuccess } =
-    useGetVerifyCode({
-      onSuccess(data, variables, context) {
-        console.log(data, '<<< code');
-      },
-    });
+  const { mutate: getVerifyCodeMutate } = useGetVerifyCode({
+    onSuccess(data) {
+      console.log(data, '<<< code');
+    },
+  });
 
   const { mutate: verifyMutate } = useVerify({
     onSuccess(response) {
-      const { data, error } = response || {};
+      const { data } = response || {};
       if (data) navigation.push('SuccessSignup');
     },
     onError: err => {
@@ -64,12 +63,7 @@ const SignUpScreen = () => {
     },
   });
 
-  const {
-    mutate: signupMutate,
-    isSuccess: isSignupSuccess,
-    data: signupData,
-    error: signupError,
-  } = useSignup({
+  const { mutate: signupMutate } = useSignup({
     onSuccess(data, variables) {
       variables.email;
       getVerifyCodeMutate({
@@ -172,7 +166,7 @@ const SignUpScreen = () => {
                 });
                 setFormValue(prev => ({ ...prev, ...vid }));
               }}>
-              {({ submit, isValid, reset }) => (
+              {({ submit, isValid }) => (
                 <View>
                   {step > 5 && (
                     <Text className="text-[#5D5D5D]">
@@ -288,7 +282,7 @@ const SignUpScreen = () => {
                   <Field
                     name={SignupFormList[3].name}
                     onBlurValidate={z.string()}>
-                    {({ value, setValue, onBlur, errors }) => {
+                    {({ setValue, onBlur, errors }) => {
                       return (
                         <Pressable
                           className="py-6"

@@ -1,5 +1,5 @@
 import React from 'react';
-import {TextInput, Text, View} from 'react-native';
+import { TextInput, Text, View } from 'react-native';
 
 interface TextFormProps {
   name: string;
@@ -11,7 +11,6 @@ interface TextFormProps {
 }
 
 const TextField = ({
-  name,
   placeholder,
   onChangeText,
   onBlur,

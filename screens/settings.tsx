@@ -3,7 +3,6 @@ import WrapperView from '@/components/wrapper-view';
 import { useUserStore } from '@/store/user-store';
 import {
   Canvas,
-  Blur,
   Image,
   useAnimatedImageValue,
 } from '@shopify/react-native-skia';

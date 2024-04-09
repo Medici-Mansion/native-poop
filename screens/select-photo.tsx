@@ -1,5 +1,5 @@
-import { View, Text, Pressable, Image, FlatList } from 'react-native';
-import React, { useEffect, useState, useTransition } from 'react';
+import { View, Pressable, Image, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { LeftArrow } from '@/assets/icons';
 import {
   CameraRoll,
@@ -11,10 +11,10 @@ import { getImageData } from '../lib/utils';
 
 const SelectPhoto = () => {
   const { navigation } = useNavi();
-  const [isPending, startTransition] = useTransition();
+
   const [photos, setPhotos] = useState<PhotoIdentifier[]>([]);
-  const [hasNextPage, setHasNextPage] = useState(false);
-  const [nextCursor, setNextCursor] = useState('');
+  const [_, setHasNextPage] = useState(false);
+  const [__, setNextCursor] = useState('');
 
   const { setImage } = useImageStore();
   const getPhotos = async () => {

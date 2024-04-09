@@ -21,17 +21,13 @@ import { TERMS } from '../const';
 import { CheckIcon, RightArrow } from '../assets/icons';
 
 const LoginScreen = () => {
-  const { mutate, data, isSuccess } = useLogin();
+  const { mutate } = useLogin();
   const [visible, setVisible] = useState(true);
   const { hideBottomSheet, ref, showBottomSheet, snapPoints } =
     useBottomSheet('50%');
 
   const { navigation } = useNavi();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const { control, handleSubmit } = useForm({
     defaultValues: {
       id: '',
       password: '',

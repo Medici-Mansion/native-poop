@@ -4,12 +4,12 @@ import ProfileAPIs from '@/apis/profile';
 import { BreedData, BreedsGroupedByConsonant } from '@/types';
 
 const useGetBreeds = (searchKey: string, searchInput: string) => {
-  console.log(searchInput);
-  const { data, isLoading, isFetching, error } = useQuery<
-    BreedData,
-    AxiosError,
-    BreedsGroupedByConsonant
-  >({
+  const {
+    data: breedsData,
+    isLoading,
+    isFetching,
+    error,
+  } = useQuery<BreedData, AxiosError, BreedsGroupedByConsonant>({
     queryKey: ['breeds'],
     queryFn: () => ProfileAPIs.getBreeds(),
     staleTime: Infinity,
@@ -46,7 +46,7 @@ const useGetBreeds = (searchKey: string, searchInput: string) => {
   });
 
   return {
-    data,
+    data: breedsData,
     isLoading,
     isFetching,
     error,

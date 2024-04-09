@@ -16,7 +16,7 @@ export const useBottomSheet = (snapPoint: string) => {
     sheetRef.current?.close();
   }, []);
 
-  const snapPoints = useMemo(() => [snapPoint], []);
+  const snapPoints = useMemo(() => [snapPoint], [snapPoint]);
 
   return {
     ref: sheetRef,

@@ -1,4 +1,4 @@
-import { Image, ImageProps, ImageStyle, StyleProp } from 'react-native';
+import { Image, ImageProps } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
