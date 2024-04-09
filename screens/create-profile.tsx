@@ -1,5 +1,13 @@
 import React, { useRef, useState } from 'react';
-import { Dimensions, Pressable, Text, TextInput, View } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  Platform,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
 import dayjs from 'dayjs';
@@ -7,7 +15,10 @@ import DatePicker from 'react-native-date-picker';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Field, Form } from 'houseform';
 import { ProfileFormList, consonantsList } from '../const';
-import { hasAndroidPermission } from '../permission/permission';
+import {
+  hasAndroidPermission,
+  hasIOSPermission,
+} from '../permission/permission';
 
 import { CloseIcon, PhotoIcon } from '@/assets/icons';
 import useProfileStore from '@/store/use-profile';
@@ -17,6 +28,7 @@ import useGetBreedds from '@/hooks/useGetBreeds';
 import useDebounce from '@/hooks/useDebounce';
 import SearchBreeds from '@/components/select-breeds';
 import ConsonantCarousel from '@/components/consonant-carousel';
+import { useImageStore } from '@/store/use-image';
 
 const PAGE_WIDTH = 35;
 const PAGE_HEIGHT = 50;
@@ -36,7 +48,7 @@ const CreateProfile = () => {
   const { data: breeds, isLoading } = useGetBreedds(searchKey, searchValue);
   const { hideBottomSheet, ref, showBottomSheet, snapPoints } =
     useBottomSheet('95%');
-
+  const { image } = useImageStore();
   const [formValue, setFormValue] = useState({
     name: '',
     birthday: '',
@@ -75,9 +87,31 @@ const CreateProfile = () => {
       </View>
       <View className="flex items-center justify-center" style={{ flex: 2 }}>
         <Pressable
-          className="p-10 rounded-full bg-[#1C1C1C]"
-          onPress={() => hasAndroidPermission(navigation)}>
-          <PhotoIcon />
+          className="rounded-full bg-[#1C1C1C] w-24 h-24 items-center justify-center overflow-hidden relative"
+          onPress={async () => {
+            let permission = false;
+            switch (Platform.OS) {
+              case 'ios':
+                permission = await hasIOSPermission();
+                break;
+              case 'android':
+                permission = await hasAndroidPermission();
+                break;
+            }
+            if (permission) {
+              navigation.push('SelectPhoto');
+            }
+          }}>
+          {image && (
+            <Image
+              source={{
+                uri: image,
+              }}
+              className="object-cover -z-10"
+              style={{ width: 100, height: 100 }}
+            />
+          )}
+          <PhotoIcon className="absolute " />
         </Pressable>
       </View>
       <View style={{ flex: 5, paddingVertical: 5 }} className="space-y-5">

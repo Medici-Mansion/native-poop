@@ -1,10 +1,12 @@
-import { RootStackParam } from '@/hooks/useNavi';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { PermissionsAndroid, Platform } from 'react-native';
+import {
+  PERMISSIONS,
+  RESULTS,
+  check,
+  requestMultiple,
+} from 'react-native-permissions';
 
-export async function hasAndroidPermission(
-  navigation: NativeStackNavigationProp<RootStackParam>,
-) {
+export async function hasAndroidPermission() {
   const getCheckPermissionPromise = () => {
     if (Number(Platform.Version) >= 33) {
       return Promise.all([
@@ -28,7 +30,6 @@ export async function hasAndroidPermission(
   const hasPermission = await getCheckPermissionPromise();
 
   if (hasPermission) {
-    navigation.push('SelectPhoto');
     return true;
   }
 
@@ -49,6 +50,28 @@ export async function hasAndroidPermission(
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
       ).then(status => status === PermissionsAndroid.RESULTS.GRANTED);
     }
+  };
+
+  return await getRequestPermissionPromise();
+}
+export async function hasIOSPermission() {
+  const getCheckPermissionPromise = async () => {
+    const result = await check(PERMISSIONS.IOS.PHOTO_LIBRARY);
+    return result === RESULTS.GRANTED;
+  };
+
+  const hasPermission = await getCheckPermissionPromise();
+
+  if (hasPermission) {
+    return true;
+  }
+
+  const getRequestPermissionPromise = async () => {
+    const PERMISSION_REQUEST_LIST = [PERMISSIONS.IOS.PHOTO_LIBRARY];
+    const result = await requestMultiple(PERMISSION_REQUEST_LIST);
+    return PERMISSION_REQUEST_LIST.every(
+      key => result[key] === RESULTS.GRANTED,
+    );
   };
 
   return await getRequestPermissionPromise();

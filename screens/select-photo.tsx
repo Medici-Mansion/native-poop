@@ -6,6 +6,7 @@ import {
   PhotoIdentifier,
 } from '@react-native-camera-roll/camera-roll';
 import { useNavi } from '@/hooks/useNavi';
+import { useImageStore } from '@/store/use-image';
 
 const SelectPhoto = () => {
   const { navigation } = useNavi();
@@ -13,6 +14,7 @@ const SelectPhoto = () => {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [nextCursor, setNextCursor] = useState('');
 
+  const { setImage } = useImageStore();
   const getPhotos = async () => {
     const { edges, page_info } = await CameraRoll.getPhotos({
       first: 10,
@@ -32,7 +34,10 @@ const SelectPhoto = () => {
     return (
       <Pressable
         className="h-[120px] w-[33%] p-1"
-        onPress={() => console.log(item.node.image.uri)}>
+        onPress={() => {
+          setImage(item.node.image.uri);
+          navigation.pop();
+        }}>
         <Image source={{ uri: item.node.image.uri }} style={{ height: 120 }} />
       </Pressable>
     );

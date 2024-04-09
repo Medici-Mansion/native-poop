@@ -1,4 +1,4 @@
-import { Image } from 'react-native';
+import { Image, ImageProps, ImageStyle, StyleProp } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -91,10 +91,14 @@ export const ListIcon = () => (
     style={{ width: 20, height: 20 }}
   />
 );
+interface PhotoIconProps extends Omit<ImageProps, 'source'> {}
 
-export const PhotoIcon = () => (
-  <Image
-    source={require('../images/photo.png')}
-    style={{ width: 20, height: 20 }}
-  />
-);
+export const PhotoIcon = ({ style, ...props }: PhotoIconProps) => {
+  return (
+    <Image
+      {...props}
+      source={require('../images/photo.png')}
+      style={[style, { width: 20, height: 20 }]}
+    />
+  );
+};
