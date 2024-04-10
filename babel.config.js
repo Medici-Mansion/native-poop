@@ -11,7 +11,7 @@ module.exports = api => {
         {
           envName: 'APP_ENV',
           moduleName: '@env',
-          path: '.env',
+          path: '.env.local',
           blocklist: null,
           allowlist: null,
           blacklist: null, // DEPRECATED

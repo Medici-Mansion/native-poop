@@ -5,13 +5,11 @@ import { Platform } from 'react-native';
 interface ContentImage {
   filename: string | null;
   filepath: string | null;
-  extension: string | null;
   uri: string;
   height: number;
   width: number;
   fileSize: number | null;
   playableDuration: number;
-  orientation: number | null;
 }
 
 export async function getImageData(
@@ -20,7 +18,7 @@ export async function getImageData(
   switch (Platform.OS) {
     case 'ios':
       const iosFile = await CameraRoll.iosGetImageDataById(content.uri);
-      return iosFile.node.image;
+      return { ...iosFile.node.image, uri: iosFile.node.image.filepath! };
     case 'android':
       const androidFile = await RNFS.stat(content.uri);
       return { ...content, uri: `file://${androidFile.originalFilepath}` };
