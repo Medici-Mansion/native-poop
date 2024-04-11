@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Dimensions,
   Image,
@@ -6,10 +6,8 @@ import {
   Text,
   View,
   StyleSheet,
-  TextInput,
   Keyboard,
 } from 'react-native';
-import { Controller, useForm } from 'react-hook-form';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
@@ -17,28 +15,64 @@ import { useBottomSheet } from '@/hooks/useBottomSheet';
 import { useNavi } from '@/hooks/useNavi';
 import useLogin from '@/hooks/user/use-login';
 
-import { TERMS } from '../const';
+import { TERMS, Token } from '../const';
 import { CheckIcon, RightArrow } from '../assets/icons';
+import { Button, Input } from '@/components/ui';
+import { Field, Form, FormInstance } from 'houseform';
+import { z } from 'zod';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { api } from '@/apis';
 
 const LoginScreen = () => {
-  const { mutate } = useLogin();
-  const [visible, setVisible] = useState(true);
+  const { mutateAsync, isPending } = useLogin();
   const { hideBottomSheet, ref, showBottomSheet, snapPoints } =
     useBottomSheet('50%');
 
   const { navigation } = useNavi();
-  const { control, handleSubmit } = useForm({
-    defaultValues: {
-      id: '',
-      password: '',
-    },
-  });
 
-  const submit = async (data: { id: string; password: string }) => {
+  const onSubmit = async (
+    data: { id: string; password: string },
+    form: FormInstance<{ id: string; password: string }>,
+  ) => {
     Keyboard.dismiss();
-    mutate(data);
-  };
+    form.recomputeErrors();
 
+    await mutateAsync(data, {
+      async onSuccess({ accessToken, refreshToken }) {
+        await Promise.allSettled([
+          AsyncStorage.setItem(Token.ACT, accessToken),
+          AsyncStorage.setItem(Token.RFT, refreshToken),
+        ]);
+        api.injectInterceptor(accessToken);
+
+        const response = await api.getMyProfileList();
+
+        /**
+         * @description 생성한 프로필이 하나도 없을 경우
+         */
+        if (!response.data.length) {
+          return navigation.replace('CreateProfile');
+        }
+
+        /**
+         * @TODO
+         * @description 프로필 목록이 존재할 경우
+         */
+      },
+      onError({ response, isAxiosError }) {
+        if (isAxiosError) {
+          /**
+           * @TODO 서버에서 커스텀 에러타입 제작 후 변경
+           * @description 프로필 목록이 존재할 경우
+           */
+          response?.data?.error?.message &&
+            form
+              .getFieldValue('id')
+              ?.setErrors([response?.data?.error?.message]);
+        }
+      },
+    });
+  };
   return (
     <GestureHandlerRootView style={styles.container}>
       <Pressable onPress={() => Keyboard.dismiss()} style={styles.logoWrapper}>
@@ -48,61 +82,63 @@ const LoginScreen = () => {
         />
       </Pressable>
       <View style={{ flex: 6 }} className="flex px-4 space-y-4">
-        <Controller
-          control={control}
-          rules={{ required: true }}
-          name="id"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl bg-[#1C1C1C] text-[12px] mb-4"
-              placeholder="아이디, 핸드폰 번호, 이메일"
-              placeholderTextColor={'#5D5D5D'}
-              onFocus={() => setVisible(false)}
-              onBlur={() => {
-                onBlur();
-                setVisible(true);
-              }}
-              onChangeText={onChange}
-              value={value}
-            />
+        <Form onSubmit={onSubmit}>
+          {({ submit }) => (
+            <View className="space-y-4">
+              <View>
+                <Field
+                  name="id"
+                  onSubmitValidate={z
+                    .string()
+                    .min(6, { message: '아이디 6자 이상' })}>
+                  {({ onBlur, value, setValue, errors }) => (
+                    <Input
+                      onBlur={onBlur}
+                      placeholder="아이디, 핸드폰 번호, 이메일"
+                      placeholderTextColor={'#5D5D5D'}
+                      onChangeText={setValue}
+                      value={value}
+                      error={errors[0]}
+                    />
+                  )}
+                </Field>
+              </View>
+              <View>
+                <Field
+                  name="password"
+                  onSubmitValidate={z
+                    .string()
+                    .min(1, { message: '비밀번호 필수' })}>
+                  {({ onBlur, value, setValue, errors }) => (
+                    <Input
+                      placeholder="비밀번호"
+                      onBlur={onBlur}
+                      onChangeText={setValue}
+                      placeholderTextColor={'#5D5D5D'}
+                      value={value}
+                      secureTextEntry
+                      error={errors[0]}
+                    />
+                  )}
+                </Field>
+              </View>
+
+              <Button disabled={isPending} label="로그인" onPress={submit} />
+            </View>
           )}
-        />
-        <Controller
-          control={control}
-          rules={{ required: true }}
-          name="password"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl bg-[#1C1C1C] text-[12px]"
-              placeholder="비밀번호"
-              onChangeText={onChange}
-              placeholderTextColor={'#5D5D5D'}
-              onFocus={() => setVisible(false)}
-              onBlur={() => {
-                onBlur();
-                setVisible(true);
-              }}
-              value={value}
-              secureTextEntry
-            />
-          )}
-        />
-        <Pressable
-          className="rounded-2xl bg-white py-4"
-          onPress={handleSubmit(submit)}>
-          <Text className="text-black text-center font-bold">로그인</Text>
-        </Pressable>
+        </Form>
         <Text className="text-white text-center py-5 text-[12px] font-bold">
           비밀번호를 잊으셨나요?
         </Text>
       </View>
-      {visible && (
-        <Pressable onPress={showBottomSheet} className="px-4">
-          <View className="flex flex-row justify-center border border-[#5D5D5D] rounded-2xl mb-5">
-            <Text className="text-white font-bold py-4">회원가입</Text>
-          </View>
-        </Pressable>
-      )}
+      <Pressable
+        disabled={isPending}
+        onPress={showBottomSheet}
+        className="px-4">
+        <View className="flex flex-row justify-center border border-[#5D5D5D] rounded-2xl mb-5">
+          <Text className="text-white font-bold py-4">회원가입</Text>
+        </View>
+      </Pressable>
 
       <BottomSheet
         ref={ref}

@@ -11,17 +11,10 @@ export interface LoginParam {
   id: string;
   password: string;
 }
-
 export interface SuccessCreateProfileRes {
   data: boolean;
   error: ApiError;
 }
-
-export interface SuccessLoginRes {
-  accessToken: string;
-  refreshToken: string;
-}
-
 export interface SignupStepInfo {
   id: number;
   name: string;

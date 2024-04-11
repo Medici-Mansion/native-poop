@@ -1,5 +1,12 @@
 import { Consonants, SignupForm } from '@/types';
 
+export const Token = {
+  ACT: 'accessToken',
+  RFT: 'refreshToken',
+};
+
+export const XCI = 'x-poop-ci';
+
 export const TERMS = [
   {
     id: 1,

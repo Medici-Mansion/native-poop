@@ -48,6 +48,7 @@ module.exports = api => {
             '@/lib': './lib',
             '@/theme': './theme',
             '@/router': './router',
+            '@/const': './const',
           },
         },
       ],

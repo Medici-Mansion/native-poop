@@ -17,7 +17,7 @@ const buttonVariatns = cva(
 
       size: {
         s: '',
-        md: 'rounded-2xl w-11/12',
+        md: 'rounded-2xl',
         lg: '',
       },
     },
