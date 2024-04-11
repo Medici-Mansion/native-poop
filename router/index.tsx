@@ -27,14 +27,14 @@ import ListScreen from '@/screens/list';
 import CreateProfile from '@/screens/create-profile';
 import SelectPhoto from '@/screens/select-photo';
 import SelectBreeds from '@/screens/select-breeds';
-import { init } from './bootstrap';
+import { init } from '../bootstrap';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 init();
 
-function App(): JSX.Element {
+export function Router(): JSX.Element {
   const { isLogin } = useUserStore();
 
   useEffect(() => {
@@ -112,5 +112,3 @@ function App(): JSX.Element {
     </SafeAreaProvider>
   );
 }
-
-export default App;
