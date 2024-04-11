@@ -1,8 +1,8 @@
 import { UseMutationOptions, useMutation } from '@tanstack/react-query';
-import LoginAPIs from '../../apis/login/index';
 import { LoginParam } from '../../types';
 import { AxiosError } from 'axios';
 import { LoginSuccess } from '@/types/server/auth/login';
+import { api } from '@/apis';
 
 const useLogin = (
   options?: UseMutationOptions<
@@ -18,7 +18,7 @@ const useLogin = (
   >({
     ...options,
     mutationKey: ['login'],
-    mutationFn: (param: LoginParam) => LoginAPIs.login(param),
+    mutationFn: api.login,
   });
 
   return muation;

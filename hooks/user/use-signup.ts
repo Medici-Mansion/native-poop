@@ -1,8 +1,8 @@
 import { ApiResponse } from './../../types/index';
 import { UseMutationOptions, useMutation } from '@tanstack/react-query';
-import SignupAPIs from '../../apis/signup';
 import { SignupParam, SuccessSignupRes } from '../../types';
 import { AxiosError } from 'axios';
+import { api } from '@/apis';
 
 const useSignup = (
   options?: UseMutationOptions<
@@ -17,7 +17,7 @@ const useSignup = (
     SignupParam
   >({
     mutationKey: ['signup'],
-    mutationFn: SignupAPIs.signup,
+    mutationFn: api.signUp,
     ...options,
   });
 
