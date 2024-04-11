@@ -1,4 +1,4 @@
-import {create} from 'zustand';
+import { create } from 'zustand';
 
 interface User {
   isLogin: boolean;
@@ -10,13 +10,13 @@ export const useUserStore = create<User>(set => ({
   isLogin: false,
 
   login: () => {
-    set(state => ({
+    set(() => ({
       isLogin: true,
     }));
   },
 
   logout: () => {
-    set(state => ({
+    set(() => ({
       isLogin: false,
     }));
   },

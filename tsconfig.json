@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "~/*": ["./*"],
+      "@/*": ["./*"],
       "*": ["./*"],
       "@/components/*": ["components/*"],
       "@/screens/*": ["screens/*"],
@@ -12,7 +12,8 @@
       "@/apis/*": ["apis/*"],
       "@/store/*": ["store/*"],
       "@/assets/*": ["assets/*"],
-      "@/types/*": ["types/*"]
+      "@/types/*": ["types/*"],
+      "@/lib/*": ["lib/*"]
     }
   }
 }

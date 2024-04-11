@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {View} from 'react-native';
+import React, { useEffect } from 'react';
+import { View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -11,12 +11,12 @@ export default function LoadingScreen() {
   const offset = useSharedValue(200);
 
   const animatedStyles = useAnimatedStyle(() => ({
-    transform: [{translateX: offset.value}],
+    transform: [{ translateX: offset.value }],
   }));
 
   useEffect(() => {
     offset.value = withRepeat(
-      withTiming(-offset.value, {duration: 1500}),
+      withTiming(-offset.value, { duration: 1500 }),
       -1,
       true,
     );

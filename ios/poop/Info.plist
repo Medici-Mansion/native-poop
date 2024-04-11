@@ -2,30 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>172.30.1.31</key>
-			<key>localhost</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
-		</dict>
-	</dict>
-	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your Camera.</string>  
-	<!-- optionally, if you want to record audio: -->
-	<key>NSMicrophoneUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your Microphone.</string>
-	<key>UIAppFonts</key>
-	<array>
-		<string>FontAwesome.ttf</string>
-		<string>AntDesign.ttf</string>
-	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -59,12 +35,33 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>$(PRODUCT_NAME) needs access to your Camera.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>$(PRODUCT_NAME) needs access to your Microphone.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>${PRODUCT_NAME} needs access to your PhotoLibrary</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fonts/pretendard/Pretendard-Black.woff2</string>
+		<string>Fonts/pretendard/Pretendard-Bold.woff2</string>
+		<string>Fonts/pretendard/Pretendard-ExtraBold.woff2</string>
+		<string>Fonts/pretendard/Pretendard-ExtraLight.woff2</string>
+		<string>Fonts/pretendard/Pretendard-Light.woff2</string>
+		<string>Fonts/pretendard/Pretendard-Medium.woff2</string>
+		<string>Fonts/pretendard/Pretendard-Regular.woff2</string>
+		<string>Fonts/pretendard/Pretendard-SemiBold.woff2</string>
+		<string>Fonts/pretendard/Pretendard-Thin.woff2</string>
+		<string>FontAwesome.ttf</string>
+		<string>AntDesign.ttf</string>
+		<string>MaterialCommunityIcons.ttf</string>
+		<string>Ionicons.ttf</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
-
 	<array>
 		<string>armv7</string>
 	</array>
