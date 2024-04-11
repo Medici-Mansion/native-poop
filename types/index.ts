@@ -12,6 +12,11 @@ export interface LoginParam {
   password: string;
 }
 
+export interface SuccessCreateProfileRes {
+  data: boolean;
+  error: ApiError;
+}
+
 export interface SuccessLoginRes {
   accessToken: string;
   refreshToken: string;

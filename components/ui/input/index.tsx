@@ -33,10 +33,10 @@ export const Input = ({ label, error, ...props }: InputProps) => {
 
   return (
     <View className="space-y-4 relative">
-      {label && <Text className="text-body-b12">{label}</Text>}
+      {label && <Text className="text-body-b12 text-[#959595]">{label}</Text>}
       <Animated.View
         style={[animatedStyles]}
-        className={'rounded-3xl bg-[#191919] border px-6 py-6'}>
+        className={'rounded-xl bg-[#191919] border px-6'}>
         <TextInput {...props} className="text-body-m14 text-white" />
       </Animated.View>
       {error && (
