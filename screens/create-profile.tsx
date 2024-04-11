@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -8,6 +8,7 @@ import {
   TextInput,
   View,
   Button,
+  ScrollView,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
@@ -34,11 +35,14 @@ import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 
 import * as z from 'zod';
 // import { RadioButton } from 'react-native-paper';
-import { Gender } from '@/types';
-import { RadioContextProvider } from '@/components/ui/radio-button/radio-button-group';
+import {
+  RadioContext,
+  RadioContextProvider,
+} from '@/components/ui/radio-button/radio-button-group';
 import { RadioButton } from '@/components/ui/radio-button/radio.button';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input } from '@/components/ui';
+import useCreateProfile from '@/hooks/profile/useCreateProfile';
 
 const PAGE_WIDTH = 35;
 const PAGE_HEIGHT = 50;
@@ -46,6 +50,14 @@ const PAGE_HEIGHT = 50;
 const CreateProfile = () => {
   const r = useRef<ICarouselInstance>(null);
   const { breed } = useProfileStore();
+  const { mutate: createProfileMutate } = useCreateProfile({
+    onSuccess: data => {
+      console.log(data, '<<<<');
+    },
+    onError: err => {
+      console.log(err);
+    },
+  });
   const { navigation } = useNavi();
   const width = Dimensions.get('window').width;
   const [picker, setPicker] = useState(false);
@@ -55,27 +67,45 @@ const CreateProfile = () => {
   const [searchInput, setSearchInput] = useState('');
   const [birthFlag, setBirthFlag] = useState(false);
   const searchValue = useDebounce(searchInput, 500);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [genders, setGenders] = useState([
+    { label: '암컷', value: 'FEMALE' },
+    { label: '수컷', value: 'MALE' },
+    { label: '선택안함', value: 'NONE' },
+  ]);
   const { data: breeds } = useGetBreedds(searchKey, searchValue);
   const { hideBottomSheet, ref, showBottomSheet, snapPoints } =
     useBottomSheet('95%');
+  const radioContext = useContext(RadioContext);
+
   const { image } = useImageStore();
   const [formValue, setFormValue] = useState({
     name: '',
     birthday: '',
   });
 
-  const onValid = v => {
-    if (!formValue.birthday || !formValue.birthday || !breed.id) {
+  const onValid = (value: any) => {
+    console.log(value, '<<<<<<<');
+    const { birthday, name } = formValue || {};
+    if (!image || !birthday || !breed.id || !name) {
       console.log('field required');
       return;
     }
 
-    const param = {
-      ...formValue,
-      breedId: breed.id || '',
-    };
+    const gender = radioContext.selected || '';
+    fetch(image)
+      .then(res => res.blob())
+      .then(blob => {
+        const formData = new FormData();
+        formData.append('avatar', blob);
+        formData.append('birthday', birthday);
+        formData.append('breedId', breed.id);
+        formData.append('gender', gender);
+        formData.append('name', name);
 
-    console.log(param, '<<<<<< param');
+        createProfileMutate(formData);
+      })
+      .catch(e => console.log(e));
   };
 
   useEffect(() => {
@@ -149,7 +179,13 @@ const CreateProfile = () => {
                         label={ProfileFormList[0].title}
                         value={value}
                         onBlur={onBlur}
-                        onChangeText={setValue}
+                        onChangeText={text => {
+                          setValue(text);
+                          setFormValue(prevState => ({
+                            ...prevState,
+                            name: text,
+                          }));
+                        }}
                         placeholder={'이름'}
                         placeholderTextColor={'#5D5D5D'}
                         returnKeyType="done"
@@ -184,20 +220,19 @@ const CreateProfile = () => {
               </Pressable>
               <View>
                 <Field name="breed">
-                  {({ value, setValue }) => (
+                  {({}) => (
                     <Pressable
                       className="flex"
                       onPress={() => {
                         setIsBreedsVisible(true);
                         showBottomSheet();
                       }}>
-                      <Text className="text-[#959595] text-[12px]">견종</Text>
-                      <TextInput
-                        className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl text-[12px]"
+                      <Input
+                        label="견종"
                         placeholder="견종 선택"
+                        placeholderTextColor={'#5D5D5D'}
                         editable={false}
                         value={breed.name || ''}
-                        placeholderTextColor={'#5D5D5D'}
                       />
                     </Pressable>
                   )}
@@ -205,11 +240,16 @@ const CreateProfile = () => {
               </View>
               <Field name="gender">
                 {({ value, setValue }) => (
-                  <RadioContextProvider>
-                    <View className="flex flex-row">
-                      <RadioButton />
-                      <RadioButton />
-                      <RadioButton />
+                  <RadioContextProvider
+                    onChangeValue={setValue}
+                    defaultValue={value}>
+                    <View className="flex flex-row py-5">
+                      {genders.map(gender => (
+                        <RadioButton
+                          label={gender.label}
+                          value={gender.value}
+                        />
+                      ))}
                     </View>
                   </RadioContextProvider>
                 )}
@@ -226,7 +266,7 @@ const CreateProfile = () => {
                 backgroundStyle={{ backgroundColor: '#121212' }}
                 handleIndicatorStyle={{ backgroundColor: 'white' }}>
                 <BottomSheetView style={{ flex: 1 }}>
-                  <View className="py-4">
+                  <ScrollView className="py-4">
                     <TextInput
                       className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl bg-[#1C1C1C] text-[12px]"
                       placeholder="검색어를 입력하세요"
@@ -262,7 +302,7 @@ const CreateProfile = () => {
                         );
                       }}
                     />
-                  </View>
+                  </ScrollView>
                   <SearchBreeds
                     breeds={breeds || {}}
                     hideBottomSheet={hideBottomSheet}
