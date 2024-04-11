@@ -1,11 +1,6 @@
 import { theme } from '@/theme';
-import {
-  Text,
-  TextInput,
-  TextInputProps,
-  View,
-  NativeModules,
-} from 'react-native';
+import { useRef } from 'react';
+import { Pressable, Text, TextInput, TextInputProps } from 'react-native';
 import Animated, {
   CurvedTransition,
   FadeIn,
@@ -13,17 +8,13 @@ import Animated, {
   useAnimatedProps,
 } from 'react-native-reanimated';
 
-const { UIManager } = NativeModules;
-
-UIManager.setLayoutAnimationEnabledExperimental &&
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-
 interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
 }
 
 export const Input = ({ label, error, ...props }: InputProps) => {
+  const ref = useRef<TextInput>(null);
   const bgColor = error ? theme.colors.system.red : 'transparent';
   const animatedStyles = useAnimatedProps(() => {
     return {
@@ -32,12 +23,19 @@ export const Input = ({ label, error, ...props }: InputProps) => {
   });
 
   return (
-    <View className="space-y-4 relative">
-      {label && <Text className="text-body-b12 text-[#959595]">{label}</Text>}
+    <Pressable
+      className="space-y-4 relative"
+      onPressIn={() => ref.current?.focus()}>
+      {label && <Text className="text-body-b12 text-gray-200">{label}</Text>}
       <Animated.View
         style={[animatedStyles]}
-        className={'rounded-xl bg-[#191919] border px-6'}>
-        <TextInput {...props} className="text-body-m14 text-white" />
+        className={'rounded-3xl bg-gray-500 border px-6 py-6'}>
+        <TextInput
+          ref={ref}
+          placeholderTextColor={theme.colors.gray[300]}
+          {...props}
+          className="text-body-m14 text-white"
+        />
       </Animated.View>
       {error && (
         <Animated.Text
@@ -49,6 +47,6 @@ export const Input = ({ label, error, ...props }: InputProps) => {
           {error}
         </Animated.Text>
       )}
-    </View>
+    </Pressable>
   );
 };

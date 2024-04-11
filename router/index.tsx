@@ -27,14 +27,14 @@ import ListScreen from '@/screens/list';
 import CreateProfile from '@/screens/create-profile';
 import SelectPhoto from '@/screens/select-photo';
 import SelectBreeds from '@/screens/select-breeds';
-import { init } from './bootstrap';
+import { init } from '../bootstrap';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 init();
 
-function App(): JSX.Element {
+export function Router(): JSX.Element {
   const { isLogin } = useUserStore();
 
   useEffect(() => {
@@ -97,7 +97,9 @@ function App(): JSX.Element {
                 />
               </Tab.Navigator>
             ) : (
-              <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Navigator
+                initialRouteName="Login"
+                screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="CreateProfile" component={CreateProfile} />
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="SignUp" component={SignUp} />
@@ -112,5 +114,3 @@ function App(): JSX.Element {
     </SafeAreaProvider>
   );
 }
-
-export default App;

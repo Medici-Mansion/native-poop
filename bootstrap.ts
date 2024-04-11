@@ -1,4 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeWindStyleSheet } from 'nativewind';
+import { Token } from './const';
+import { api } from './apis';
 
 function calcLineHeight(fontSize: number, percentage: number) {
   return fontSize * percentage;
@@ -13,7 +16,7 @@ function calcLineHeight(fontSize: number, percentage: number) {
  * 700	Bold
  * 800	Extra Bold (Ultra Bold)
  */
-export function init() {
+export async function init() {
   NativeWindStyleSheet.create({
     styles: {
       // Text Head
@@ -82,4 +85,10 @@ export function init() {
       // Colors
     },
   });
+
+  const act = await AsyncStorage.getItem(Token.ACT);
+
+  if (act) {
+    api.injectInterceptor(act);
+  }
 }

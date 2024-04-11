@@ -1,7 +1,7 @@
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
-import ProfileAPIs from '@/apis/profile';
 import { ApiResponse, SuccessCreateProfileRes } from '@/types';
 import { AxiosError } from 'axios';
+import { api } from '@/apis';
 
 const useCreateProfile = (
   options?: UseMutationOptions<
@@ -16,7 +16,7 @@ const useCreateProfile = (
     FormData
   >({
     mutationKey: ['create-profile'],
-    mutationFn: (param: any) => ProfileAPIs.createProfile(param),
+    mutationFn: api.createProfile,
     ...(options ?? {}),
   });
 

@@ -1,7 +1,7 @@
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
-import SignupAPIs from '@/apis/signup';
 import { SuccessVerifyRes, VerifyCheckParam } from '@/types';
 import { AxiosError } from 'axios';
+import { api } from '@/apis';
 
 const useVerify = (
   options?: UseMutationOptions<SuccessVerifyRes, AxiosError, VerifyCheckParam>,
@@ -12,7 +12,7 @@ const useVerify = (
     VerifyCheckParam
   >({
     mutationKey: ['verify'],
-    mutationFn: (param: VerifyCheckParam) => SignupAPIs.verify(param),
+    mutationFn: api.verify,
     ...(options ?? {}),
   });
 

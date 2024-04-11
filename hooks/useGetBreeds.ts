@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import ProfileAPIs from '@/apis/profile';
 import { BreedData, BreedsGroupedByConsonant } from '@/types';
+import { api } from '@/apis';
 
 const useGetBreeds = (searchKey: string, searchInput: string) => {
   const {
@@ -11,7 +11,7 @@ const useGetBreeds = (searchKey: string, searchInput: string) => {
     error,
   } = useQuery<BreedData, AxiosError, BreedsGroupedByConsonant>({
     queryKey: ['breeds'],
-    queryFn: () => ProfileAPIs.getBreeds(),
+    queryFn: api.getBreeds,
     staleTime: Infinity,
     gcTime: Infinity,
     select: data => {

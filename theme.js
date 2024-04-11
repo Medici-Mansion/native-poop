@@ -11,6 +11,7 @@ const theme = {
     'head-sb12': 12,
     // // BODY
     'body-b16': 16,
+    'body-b14': 14,
     'body-m14': [
       14,
       {
@@ -40,6 +41,7 @@ const theme = {
       80: 'rgba(18,18,18,0.8)',
       60: 'rgba(0,0,0,0.6)',
     },
+    black: '#000000',
   },
 };
 
