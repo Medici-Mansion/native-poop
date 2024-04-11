@@ -196,7 +196,7 @@ const CreateProfile = () => {
                   }}
                 </Field>
               </View>
-              <Pressable onPress={() => setPicker(true)}>
+              <Pressable>
                 <Field name={'birthday'} onChangeValidate={z.string().min(1)}>
                   {({ value, setValue, onBlur, errors }) => {
                     const v = birthFlag ? dayjs(date).format('YYYY-MM-DD') : '';
@@ -205,6 +205,7 @@ const CreateProfile = () => {
                     }
                     return (
                       <Input
+                        onOuterPressIn={() => setPicker(true)}
                         label={ProfileFormList[1].title}
                         onPressIn={() => setPicker(true)}
                         value={date ? dayjs(date).format('YYYY-MM-DD') : ''}
@@ -221,20 +222,18 @@ const CreateProfile = () => {
               <View>
                 <Field name="breed">
                   {({}) => (
-                    <Pressable
-                      className="flex"
-                      onPress={() => {
+                    <Input
+                      onOuterPressIn={() => {
+                        console.log('???????');
                         setIsBreedsVisible(true);
                         showBottomSheet();
-                      }}>
-                      <Input
-                        label="견종"
-                        placeholder="견종 선택"
-                        placeholderTextColor={'#5D5D5D'}
-                        editable={false}
-                        value={breed.name || ''}
-                      />
-                    </Pressable>
+                      }}
+                      label="견종"
+                      placeholder="견종 선택"
+                      placeholderTextColor={'#5D5D5D'}
+                      editable={false}
+                      value={breed.name || ''}
+                    />
                   )}
                 </Field>
               </View>
@@ -246,6 +245,7 @@ const CreateProfile = () => {
                     <View className="flex flex-row py-5">
                       {genders.map(gender => (
                         <RadioButton
+                          key={gender.value}
                           label={gender.label}
                           value={gender.value}
                         />

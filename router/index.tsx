@@ -98,7 +98,7 @@ export function Router(): JSX.Element {
               </Tab.Navigator>
             ) : (
               <Stack.Navigator
-                initialRouteName="Login"
+                initialRouteName="CreateProfile"
                 screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="CreateProfile" component={CreateProfile} />
                 <Stack.Screen name="Login" component={LoginScreen} />

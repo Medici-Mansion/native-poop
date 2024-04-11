@@ -1,6 +1,12 @@
 import { theme } from '@/theme';
 import { useRef } from 'react';
-import { Pressable, Text, TextInput, TextInputProps } from 'react-native';
+import {
+  GestureResponderEvent,
+  Pressable,
+  Text,
+  TextInput,
+  TextInputProps,
+} from 'react-native';
 import Animated, {
   CurvedTransition,
   FadeIn,
@@ -11,9 +17,15 @@ import Animated, {
 interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
+  onOuterPressIn?: (event: GestureResponderEvent) => void;
 }
 
-export const Input = ({ label, error, ...props }: InputProps) => {
+export const Input = ({
+  label,
+  error,
+  onOuterPressIn,
+  ...props
+}: InputProps) => {
   const ref = useRef<TextInput>(null);
   const bgColor = error ? theme.colors.system.red : 'transparent';
   const animatedStyles = useAnimatedProps(() => {
@@ -25,7 +37,10 @@ export const Input = ({ label, error, ...props }: InputProps) => {
   return (
     <Pressable
       className="space-y-4 relative"
-      onPressIn={() => ref.current?.focus()}>
+      onPressIn={event => {
+        onOuterPressIn && onOuterPressIn(event);
+        ref.current?.focus();
+      }}>
       {label && <Text className="text-body-b12 text-gray-200">{label}</Text>}
       <Animated.View
         style={[animatedStyles]}
