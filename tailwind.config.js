@@ -1,3 +1,5 @@
+const { theme } = require('./theme');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -6,7 +8,8 @@ module.exports = {
     './components/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      ...theme,
+    },
   },
-  plugins: [],
 };

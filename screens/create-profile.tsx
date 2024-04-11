@@ -33,6 +33,12 @@ import { useImageStore } from '@/store/use-image';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 
 import * as z from 'zod';
+// import { RadioButton } from 'react-native-paper';
+import { Gender } from '@/types';
+import { RadioContextProvider } from '@/components/ui/radio-button/radio-button-group';
+import { RadioButton } from '@/components/ui/radio-button/radio.button';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Input } from '@/components/ui';
 
 const PAGE_WIDTH = 35;
 const PAGE_HEIGHT = 50;
@@ -44,7 +50,7 @@ const CreateProfile = () => {
   const width = Dimensions.get('window').width;
   const [picker, setPicker] = useState(false);
   const [isBreedsVisible, setIsBreedsVisible] = useState(false);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState<Date | null>(null);
   const [searchKey, setSearchKey] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [birthFlag, setBirthFlag] = useState(false);
@@ -59,7 +65,6 @@ const CreateProfile = () => {
   });
 
   const onValid = v => {
-    console.log(v);
     if (!formValue.birthday || !formValue.birthday || !breed.id) {
       console.log('field required');
       return;
@@ -82,18 +87,16 @@ const CreateProfile = () => {
     }
   }, [image]);
   return (
-    <GestureHandlerRootView
-      style={{
-        flex: 1,
-        backgroundColor: 'black',
-        paddingHorizontal: 12,
-      }}>
+    <GestureHandlerRootView>
       <Form onSubmit={onValid}>
         {({ submit, isValid }) => (
-          <>
-            <View
-              className="flex flex-row justify-between items-center py-3"
-              style={{ flex: 1 }}>
+          <SafeAreaView
+            style={{
+              flex: 1,
+              backgroundColor: 'black',
+              paddingHorizontal: 12,
+            }}>
+            <View className="flex flex-row justify-between items-center">
               <Pressable onPress={() => navigation.push('Login')}>
                 <CloseIcon size={25} />
               </Pressable>
@@ -104,9 +107,7 @@ const CreateProfile = () => {
                 onPress={submit}
               />
             </View>
-            <View
-              className="flex items-center justify-center"
-              style={{ flex: 2 }}>
+            <View className="flex items-center justify-center py-16">
               <Pressable
                 className="rounded-full bg-[#1C1C1C] w-24 h-24 items-center justify-center overflow-hidden relative"
                 onPress={async () => {
@@ -135,81 +136,57 @@ const CreateProfile = () => {
                 <PhotoIcon className="absolute " />
               </Pressable>
             </View>
-            <View style={{ flex: 5, paddingVertical: 5 }} className="space-y-5">
+            <View className="flex space-y-8">
               <View>
                 <Field
                   name={ProfileFormList[0].name}
-                  onChangeValidate={z.string().min(2, { message: '?!?!?!?' })}>
+                  onChangeValidate={z
+                    .string()
+                    .min(2, { message: '2글자 이상' })}>
                   {({ value, setValue, onBlur, errors }) => {
                     return (
-                      <View className="py-6">
-                        <TextInput
-                          value={value}
-                          onBlur={onBlur}
-                          onChangeText={setValue}
-                          placeholder={'이름'}
-                          placeholderTextColor={'#5D5D5D'}
-                          keyboardType="number-pad"
-                          className="rounded-xl bg-[#191919] text-white border-white px-6 py-3"
-                        />
-                        {errors.map(error => (
-                          <Text key={error} className="text-white mt-3 ml-3">
-                            {error}
-                          </Text>
-                        ))}
-                      </View>
+                      <Input
+                        label={ProfileFormList[0].title}
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={setValue}
+                        placeholder={'이름'}
+                        placeholderTextColor={'#5D5D5D'}
+                        returnKeyType="done"
+                        returnKeyLabel="입력하기"
+                        error={errors[0]}
+                      />
                     );
                   }}
                 </Field>
               </View>
+              <Pressable onPress={() => setPicker(true)}>
+                <Field name={'birthday'} onChangeValidate={z.string().min(1)}>
+                  {({ value, setValue, onBlur, errors }) => {
+                    const v = birthFlag ? dayjs(date).format('YYYY-MM-DD') : '';
+                    if (value !== v) {
+                      setValue(v);
+                    }
+                    return (
+                      <Input
+                        label={ProfileFormList[1].title}
+                        onPressIn={() => setPicker(true)}
+                        value={date ? dayjs(date).format('YYYY-MM-DD') : ''}
+                        onBlur={onBlur}
+                        editable={false}
+                        placeholder={ProfileFormList[1].placeholder}
+                        placeholderTextColor={'#5D5D5D'}
+                        error={errors[0]}
+                      />
+                    );
+                  }}
+                </Field>
+              </Pressable>
               <View>
-                <View>
-                  <Text className="text-[#5D5D5D]">
-                    {ProfileFormList[1].placeholder}
-                  </Text>
-                  <Field name={'birthday'} onChangeValidate={z.string().min(1)}>
-                    {({ value, setValue, onBlur, errors }) => {
-                      const v = birthFlag
-                        ? dayjs(date).format('YYYY-MM-DD')
-                        : '';
-                      if (value !== v) {
-                        setValue(v);
-                      }
-                      return (
-                        <Pressable
-                          className="py-6"
-                          onPress={() => setPicker(true)}>
-                          <TextInput
-                            onPressIn={() => setPicker(true)}
-                            value={
-                              birthFlag
-                                ? dayjs(date).format('YYYY-MM-DD')
-                                : ProfileFormList[1].placeholder
-                            }
-                            onBlur={onBlur}
-                            editable={false}
-                            placeholder={ProfileFormList[1].placeholder}
-                            placeholderTextColor={'#5D5D5D'}
-                            className={`rounded-xl bg-[#191919] border-white px-6 py-3 ${
-                              birthFlag ? 'text-white' : 'text-[#5D5D5D]'
-                            }`}
-                          />
-                          {errors.map(error => (
-                            <Text key={error} className="text-white mt-3 ml-3">
-                              {error}
-                            </Text>
-                          ))}
-                        </Pressable>
-                      );
-                    }}
-                  </Field>
-                </View>
-              </View>
-              <Field name="breed">
-                {({ value, setValue }) => (
-                  <View>
+                <Field name="breed">
+                  {({ value, setValue }) => (
                     <Pressable
-                      className="flex gap-y-3"
+                      className="flex"
                       onPress={() => {
                         setIsBreedsVisible(true);
                         showBottomSheet();
@@ -223,10 +200,22 @@ const CreateProfile = () => {
                         placeholderTextColor={'#5D5D5D'}
                       />
                     </Pressable>
-                  </View>
+                  )}
+                </Field>
+              </View>
+              <Field name="gender">
+                {({ value, setValue }) => (
+                  <RadioContextProvider>
+                    <View className="flex flex-row">
+                      <RadioButton />
+                      <RadioButton />
+                      <RadioButton />
+                    </View>
+                  </RadioContextProvider>
                 )}
               </Field>
             </View>
+
             {isBreedsVisible && (
               <BottomSheet
                 ref={ref}
@@ -282,7 +271,7 @@ const CreateProfile = () => {
               </BottomSheet>
             )}
             {picker && (
-              <>
+              <View className="absolute bottom-0 w-screen">
                 <Pressable
                   onPress={() => {
                     setPicker(false);
@@ -298,7 +287,7 @@ const CreateProfile = () => {
                 </Pressable>
                 <DatePicker
                   className="bg-gray-200 w-full"
-                  date={date}
+                  date={date ? date : new Date()}
                   locale="ko"
                   mode="date"
                   androidVariant="iosClone"
@@ -311,9 +300,9 @@ const CreateProfile = () => {
                     setPicker(false);
                   }}
                 />
-              </>
+              </View>
             )}
-          </>
+          </SafeAreaView>
         )}
       </Form>
     </GestureHandlerRootView>
