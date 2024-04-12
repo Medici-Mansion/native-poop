@@ -22,11 +22,13 @@ import { Field, Form, FormInstance } from 'houseform';
 import { z } from 'zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '@/apis';
+import { useQueryClient } from '@tanstack/react-query';
 
 const LoginScreen = () => {
   const { mutateAsync, isPending } = useLogin();
   const { hideBottomSheet, ref, showBottomSheet, snapPoints } =
     useBottomSheet('50%');
+  const queryClient = useQueryClient();
 
   const { navigation } = useNavi();
 
@@ -50,14 +52,18 @@ const LoginScreen = () => {
         /**
          * @description 생성한 프로필이 하나도 없을 경우
          */
+
         if (!response.data.length) {
           return navigation.replace('CreateProfile');
         }
 
+        queryClient.setQueryData(['profiles'], response.data);
         /**
          * @TODO
          * @description 프로필 목록이 존재할 경우
          */
+
+        return navigation.replace('select-profile');
       },
       onError({ response, isAxiosError }) {
         if (isAxiosError) {

@@ -17,12 +17,14 @@ import Animated, {
 interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
+  hint?: string;
   onOuterPressIn?: (event: GestureResponderEvent) => void;
 }
 
 export const Input = ({
   label,
   error,
+  hint,
   onOuterPressIn,
   ...props
 }: InputProps) => {
@@ -52,15 +54,26 @@ export const Input = ({
           className="text-body-m14 text-white"
         />
       </Animated.View>
-      {error && (
+      {hint ? (
         <Animated.Text
           entering={FadeIn.duration(100).springify().mass(0.3)}
           exiting={FadeOut.duration(100).springify().mass(0.3)}
           layout={CurvedTransition.duration(100).delay(120)}
-          key={error}
-          className="text-system-red">
-          {error}
+          key={hint}
+          className="text-white">
+          {hint}
         </Animated.Text>
+      ) : (
+        error && (
+          <Animated.Text
+            entering={FadeIn.duration(100).springify().mass(0.3)}
+            exiting={FadeOut.duration(100).springify().mass(0.3)}
+            layout={CurvedTransition.duration(100).delay(120)}
+            key={error}
+            className="text-system-red">
+            {error}
+          </Animated.Text>
+        )
       )}
     </Pressable>
   );

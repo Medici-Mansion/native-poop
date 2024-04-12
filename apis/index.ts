@@ -9,6 +9,7 @@ import {
 import { Response } from '@/types/server';
 import { LoginSuccess } from '@/types/server/auth/login';
 import { GetMyProfiles } from '@/types/server/profile';
+import { GetMeResponse } from '@/types/server/user/me';
 import { API_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
@@ -27,6 +28,17 @@ class PoopApi {
       method: 'GET',
       url: '/v1/common/breeds',
     });
+    return data;
+  }
+
+  // User
+
+  async getMe() {
+    const { data } = await PoopApi.handler<Response<GetMeResponse>>({
+      method: 'GET',
+      url: '/v1/users/me',
+    });
+
     return data;
   }
 

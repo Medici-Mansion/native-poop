@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -10,7 +10,6 @@ import {
   Button,
   ScrollView,
 } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
 import dayjs from 'dayjs';
 import DatePicker from 'react-native-date-picker';
@@ -23,7 +22,6 @@ import {
 } from '../permission/permission';
 
 import { CloseIcon, PhotoIcon } from '@/assets/icons';
-import useProfileStore from '@/store/use-profile';
 import { useNavi } from '@/hooks/useNavi';
 import { useBottomSheet } from '@/hooks/useBottomSheet';
 import useGetBreedds from '@/hooks/useGetBreeds';
@@ -31,95 +29,104 @@ import useDebounce from '@/hooks/useDebounce';
 import SearchBreeds from '@/components/select-breeds';
 import ConsonantCarousel from '@/components/consonant-carousel';
 import { useImageStore } from '@/store/use-image';
-import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 
 import * as z from 'zod';
-// import { RadioButton } from 'react-native-paper';
-import {
-  RadioContext,
-  RadioContextProvider,
-} from '@/components/ui/radio-button/radio-button-group';
+import { RadioContextProvider } from '@/components/ui/radio-button/radio-button-group';
 import { RadioButton } from '@/components/ui/radio-button/radio.button';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input } from '@/components/ui';
 import useCreateProfile from '@/hooks/profile/useCreateProfile';
+import { Portal } from 'react-native-portalize';
 
 const PAGE_WIDTH = 35;
 const PAGE_HEIGHT = 50;
 
+const schema = z.object({
+  birthday: z.string(),
+  breed: z.object({
+    avatar: z.string(),
+    id: z.string(),
+    name: z.string(),
+    nameEN: z.string(),
+  }),
+  gender: z.string(),
+  name: z.string(),
+});
+
 const CreateProfile = () => {
   const r = useRef<ICarouselInstance>(null);
-  const { breed } = useProfileStore();
   const { mutate: createProfileMutate } = useCreateProfile({
     onSuccess: data => {
       console.log(data, '<<<<');
     },
     onError: err => {
-      console.log(err);
+      console.log({ err });
+      console.log(err.response?.data);
     },
   });
   const { navigation } = useNavi();
   const width = Dimensions.get('window').width;
   const [picker, setPicker] = useState(false);
   const [isBreedsVisible, setIsBreedsVisible] = useState(false);
-  const [date, setDate] = useState<Date | null>(null);
   const [searchKey, setSearchKey] = useState('');
   const [searchInput, setSearchInput] = useState('');
-  const [birthFlag, setBirthFlag] = useState(false);
   const searchValue = useDebounce(searchInput, 500);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [genders, setGenders] = useState([
-    { label: '암컷', value: 'FEMALE' },
-    { label: '수컷', value: 'MALE' },
-    { label: '선택안함', value: 'NONE' },
-  ]);
+
+  const genders = useMemo(
+    () => [
+      { label: '암컷', value: 'FEMALE' },
+      { label: '수컷', value: 'MALE' },
+      { label: '선택안함', value: 'NONE' },
+    ],
+    [],
+  );
   const { data: breeds } = useGetBreedds(searchKey, searchValue);
   const { hideBottomSheet, ref, showBottomSheet, snapPoints } =
     useBottomSheet('95%');
-  const radioContext = useContext(RadioContext);
 
   const { image } = useImageStore();
-  const [formValue, setFormValue] = useState({
-    name: '',
-    birthday: '',
-  });
 
-  const onValid = (value: any) => {
-    console.log(value, '<<<<<<<');
-    const { birthday, name } = formValue || {};
-    if (!image || !birthday || !breed.id || !name) {
+  const onValid = (value: z.infer<typeof schema>) => {
+    console.log({ value }, image);
+    const { birthday, breed, gender, name } = value;
+    if (!image || !birthday || !gender || !breed.id || !name) {
       console.log('field required');
       return;
     }
+    const formData = new FormData();
+    formData.append('avatar', {
+      name: image.filename,
+      type: 'image/jpeg',
+      uri: image.uri,
+    });
+    formData.append('birthday', birthday);
+    formData.append('breedId', breed.id);
+    formData.append('gender', gender);
+    formData.append('name', name);
 
-    const gender = radioContext.selected || '';
-    fetch(image)
-      .then(res => res.blob())
-      .then(blob => {
-        const formData = new FormData();
-        formData.append('avatar', blob);
-        formData.append('birthday', birthday);
-        formData.append('breedId', breed.id);
-        formData.append('gender', gender);
-        formData.append('name', name);
+    createProfileMutate(formData);
+    // RNFetchBlob.fetch('GET', image.uri)
+    //   .then(res => res.base64())
+    //   .then(base64 => {
+    //     console.log(base64, '<<<blob');
 
-        createProfileMutate(formData);
-      })
-      .catch(e => console.log(e));
+    //   })
+    //   .catch(e => console.log(e));
+    // fetch(image)
+    //   .then(res => res.blob())
+    //   .then(blob => {
+    //   ;
+    //   })
+    //   .catch(e => console.log(e));
   };
 
-  useEffect(() => {
-    if (image) {
-      console.log(image, '<<<image');
-      CameraRoll.iosGetImageDataById(image).then(res => {
-        console.log(res);
-      });
-    }
-  }, [image]);
   return (
-    <GestureHandlerRootView>
-      <Form onSubmit={onValid}>
-        {({ submit, isValid }) => (
+    <Form onSubmit={onValid}>
+      {({ submit, isValid, value: formValue, getFieldValue }) => {
+        const isAllFieldValid =
+          Object.keys(formValue).every(key => getFieldValue(key)?.value) &&
+          !!image;
+        return (
           <SafeAreaView
             style={{
               flex: 1,
@@ -131,8 +138,8 @@ const CreateProfile = () => {
                 <CloseIcon size={25} />
               </Pressable>
               <Button
-                disabled={!isValid}
-                title={`${isValid}`}
+                disabled={!isAllFieldValid || !isValid}
+                title={`${isAllFieldValid && isValid}`}
                 color="white"
                 onPress={submit}
               />
@@ -157,7 +164,7 @@ const CreateProfile = () => {
                 {image && (
                   <Image
                     source={{
-                      uri: image,
+                      uri: image.uri,
                     }}
                     className="object-cover -z-10"
                     style={{ width: 100, height: 100 }}
@@ -172,8 +179,9 @@ const CreateProfile = () => {
                   name={ProfileFormList[0].name}
                   onChangeValidate={z
                     .string()
-                    .min(2, { message: '2글자 이상' })}>
-                  {({ value, setValue, onBlur, errors }) => {
+                    .min(2, { message: '2글자 이상' })}
+                  onMountHint={z.string().min(2, { message: '2글자 이상' })}>
+                  {({ value, setValue, onBlur, errors, hints }) => {
                     return (
                       <Input
                         label={ProfileFormList[0].title}
@@ -181,15 +189,12 @@ const CreateProfile = () => {
                         onBlur={onBlur}
                         onChangeText={text => {
                           setValue(text);
-                          setFormValue(prevState => ({
-                            ...prevState,
-                            name: text,
-                          }));
                         }}
                         placeholder={'이름'}
                         placeholderTextColor={'#5D5D5D'}
                         returnKeyType="done"
                         returnKeyLabel="입력하기"
+                        hint={hints[0]}
                         error={errors[0]}
                       />
                     );
@@ -197,43 +202,134 @@ const CreateProfile = () => {
                 </Field>
               </View>
               <Pressable>
-                <Field name={'birthday'} onChangeValidate={z.string().min(1)}>
-                  {({ value, setValue, onBlur, errors }) => {
-                    const v = birthFlag ? dayjs(date).format('YYYY-MM-DD') : '';
-                    if (value !== v) {
-                      setValue(v);
-                    }
-                    return (
+                <Field
+                  name={'birthday'}
+                  onChangeValidate={z.string().min(1)}
+                  onMountHint={z.string().min(1)}>
+                  {({ value, setValue, onBlur, errors }) => (
+                    <>
                       <Input
                         onOuterPressIn={() => setPicker(true)}
                         label={ProfileFormList[1].title}
                         onPressIn={() => setPicker(true)}
-                        value={date ? dayjs(date).format('YYYY-MM-DD') : ''}
+                        value={value ?? ''}
                         onBlur={onBlur}
                         editable={false}
                         placeholder={ProfileFormList[1].placeholder}
                         placeholderTextColor={'#5D5D5D'}
                         error={errors[0]}
                       />
-                    );
-                  }}
+                      <Portal>
+                        {picker && (
+                          <View className="absolute bottom-0 w-screen">
+                            <Pressable
+                              onPress={() => {
+                                setPicker(false);
+                              }}>
+                              <Text className="bg-white text-black text-center py-3">
+                                확인
+                              </Text>
+                            </Pressable>
+                            <DatePicker
+                              className="bg-gray-200 w-full"
+                              date={value ? new Date(value) : new Date()}
+                              locale="ko"
+                              mode="date"
+                              androidVariant="iosClone"
+                              onDateChange={newDate =>
+                                setValue(dayjs(newDate).format('YYYY-MM-DD'))
+                              }
+                              onConfirm={newDate => {
+                                setPicker(false);
+                                setValue(dayjs(newDate).format('YYYY-MM-DD'));
+                              }}
+                              onCancel={() => {
+                                setPicker(false);
+                              }}
+                            />
+                          </View>
+                        )}
+                      </Portal>
+                    </>
+                  )}
                 </Field>
               </Pressable>
               <View>
                 <Field name="breed">
-                  {({}) => (
-                    <Input
-                      onOuterPressIn={() => {
-                        console.log('???????');
-                        setIsBreedsVisible(true);
-                        showBottomSheet();
-                      }}
-                      label="견종"
-                      placeholder="견종 선택"
-                      placeholderTextColor={'#5D5D5D'}
-                      editable={false}
-                      value={breed.name || ''}
-                    />
+                  {({ value, setValue }) => (
+                    <>
+                      <Input
+                        onOuterPressIn={() => {
+                          console.log('???????');
+                          setIsBreedsVisible(true);
+                          showBottomSheet();
+                        }}
+                        label="견종"
+                        placeholder="견종 선택"
+                        placeholderTextColor={'#5D5D5D'}
+                        editable={false}
+                        value={value.name || ''}
+                      />
+                      <Portal>
+                        {isBreedsVisible && (
+                          <BottomSheet
+                            ref={ref}
+                            // index={}
+                            detached
+                            snapPoints={snapPoints}
+                            enablePanDownToClose={true}
+                            backgroundStyle={{ backgroundColor: '#121212' }}
+                            handleIndicatorStyle={{
+                              backgroundColor: 'white',
+                            }}>
+                            <BottomSheetView style={{ flex: 1 }}>
+                              <ScrollView className="py-4">
+                                <TextInput
+                                  className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl bg-[#1C1C1C] text-[12px]"
+                                  placeholder="검색어를 입력하세요"
+                                  placeholderTextColor={'#5D5D5D'}
+                                  onChangeText={text => setSearchInput(text)}
+                                />
+                                <Carousel
+                                  ref={r}
+                                  loop={false}
+                                  style={{
+                                    width: width,
+                                    height: PAGE_HEIGHT,
+                                    alignItems: 'center',
+                                    borderBottomWidth: 1,
+                                    borderBottomColor: '#1C1C1C',
+                                  }}
+                                  data={consonantsList}
+                                  width={PAGE_WIDTH}
+                                  height={PAGE_HEIGHT}
+                                  renderItem={({ item, animationValue }) => {
+                                    return (
+                                      <ConsonantCarousel
+                                        animationValue={animationValue}
+                                        label={item.value}
+                                        onPress={() => {
+                                          r.current?.scrollTo({
+                                            count: animationValue.value,
+                                            animated: true,
+                                          });
+                                          setSearchKey(item.value);
+                                        }}
+                                      />
+                                    );
+                                  }}
+                                />
+                              </ScrollView>
+                              <SearchBreeds
+                                breeds={breeds || {}}
+                                hideBottomSheet={hideBottomSheet}
+                                onSelect={setValue}
+                              />
+                            </BottomSheetView>
+                          </BottomSheet>
+                        )}
+                      </Portal>
+                    </>
                   )}
                 </Field>
               </View>
@@ -255,97 +351,10 @@ const CreateProfile = () => {
                 )}
               </Field>
             </View>
-
-            {isBreedsVisible && (
-              <BottomSheet
-                ref={ref}
-                // index={}
-                detached
-                snapPoints={snapPoints}
-                enablePanDownToClose={true}
-                backgroundStyle={{ backgroundColor: '#121212' }}
-                handleIndicatorStyle={{ backgroundColor: 'white' }}>
-                <BottomSheetView style={{ flex: 1 }}>
-                  <ScrollView className="py-4">
-                    <TextInput
-                      className="text-white border border-[#1C1C1C] px-5 py-3 rounded-2xl bg-[#1C1C1C] text-[12px]"
-                      placeholder="검색어를 입력하세요"
-                      placeholderTextColor={'#5D5D5D'}
-                      onChangeText={text => setSearchInput(text)}
-                    />
-                    <Carousel
-                      ref={r}
-                      loop={false}
-                      style={{
-                        width: width,
-                        height: PAGE_HEIGHT,
-                        alignItems: 'center',
-                        borderBottomWidth: 1,
-                        borderBottomColor: '#1C1C1C',
-                      }}
-                      data={consonantsList}
-                      width={PAGE_WIDTH}
-                      height={PAGE_HEIGHT}
-                      renderItem={({ item, animationValue }) => {
-                        return (
-                          <ConsonantCarousel
-                            animationValue={animationValue}
-                            label={item.value}
-                            onPress={() => {
-                              r.current?.scrollTo({
-                                count: animationValue.value,
-                                animated: true,
-                              });
-                              setSearchKey(item.value);
-                            }}
-                          />
-                        );
-                      }}
-                    />
-                  </ScrollView>
-                  <SearchBreeds
-                    breeds={breeds || {}}
-                    hideBottomSheet={hideBottomSheet}
-                  />
-                </BottomSheetView>
-              </BottomSheet>
-            )}
-            {picker && (
-              <View className="absolute bottom-0 w-screen">
-                <Pressable
-                  onPress={() => {
-                    setPicker(false);
-                    setBirthFlag(true);
-                    setFormValue(prev => ({
-                      ...prev,
-                      birthday: dayjs(date).format('YYYY-MM-DD'),
-                    }));
-                  }}>
-                  <Text className="bg-white text-black text-center py-3">
-                    확인
-                  </Text>
-                </Pressable>
-                <DatePicker
-                  className="bg-gray-200 w-full"
-                  date={date ? date : new Date()}
-                  locale="ko"
-                  mode="date"
-                  androidVariant="iosClone"
-                  onDateChange={setDate}
-                  onConfirm={newDate => {
-                    setPicker(false);
-                    setDate(newDate);
-                  }}
-                  onCancel={() => {
-                    setPicker(false);
-                  }}
-                />
-              </View>
-            )}
           </SafeAreaView>
-        )}
-      </Form>
-    </GestureHandlerRootView>
+        );
+      }}
+    </Form>
   );
 };
 

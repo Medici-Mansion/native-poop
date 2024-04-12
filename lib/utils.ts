@@ -8,7 +8,7 @@ export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 };
 
-interface ContentImage {
+export interface ContentImage {
   filename: string | null;
   filepath: string | null;
   uri: string;

@@ -8,6 +8,7 @@ import {
 import { useNavi } from '@/hooks/useNavi';
 import { useImageStore } from '@/store/use-image';
 import { getImageData } from '../lib/utils';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const SelectPhoto = () => {
   const { navigation } = useNavi();
@@ -31,8 +32,16 @@ const SelectPhoto = () => {
 
   const handleSelectImage = (item: PhotoIdentifier) => async () => {
     const image = await getImageData(item.node.image);
-    setImage(image.uri);
-    navigation.pop();
+    ImagePicker.openCropper({
+      path: image.uri,
+      width: 320,
+      height: 320,
+      mediaType: 'photo',
+    }).then(newImage => {
+      image.uri = `file://${newImage.path}`;
+      setImage(image);
+      navigation.pop();
+    });
   };
 
   useEffect(() => {

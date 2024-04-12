@@ -3,17 +3,20 @@ import { View, Text, Pressable } from 'react-native';
 import { Breed, BreedsGroupedByConsonant } from '@/types';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Image } from 'react-native';
-import useProfileStore from '@/store/use-profile';
 
 interface SearchBreedsProps {
   breeds: BreedsGroupedByConsonant;
   hideBottomSheet: () => void;
+  onSelect?: (breed: Breed) => void;
 }
 
-const SearchBreeds = ({ breeds, hideBottomSheet }: SearchBreedsProps) => {
-  const { setBreed } = useProfileStore();
+const SearchBreeds = ({
+  breeds,
+  onSelect,
+  hideBottomSheet,
+}: SearchBreedsProps) => {
   const selectHandler = (breed: Breed) => {
-    setBreed(breed);
+    onSelect && onSelect(breed);
     hideBottomSheet();
   };
 

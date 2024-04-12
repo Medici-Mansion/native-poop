@@ -1,7 +1,8 @@
+import { ContentImage } from '@/lib/utils';
 import { create } from 'zustand';
 interface ImageStore {
-  image?: string;
-  setImage: (image: string) => void;
+  image?: ContentImage | null;
+  setImage: (image: ContentImage) => void;
 }
 
 /**
@@ -10,7 +11,7 @@ interface ImageStore {
  * @deprecated
  */
 export const useImageStore = create<ImageStore>(set => ({
-  image: '',
+  image: null,
   setImage(image) {
     set({ image });
   },
