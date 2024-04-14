@@ -62,8 +62,8 @@ const LoginScreen = () => {
          * @TODO
          * @description 프로필 목록이 존재할 경우
          */
-
-        return navigation.replace('select-profile');
+        queryClient.resetQueries({ queryKey: ['check', 'login'] });
+        return;
       },
       onError({ response, isAxiosError }) {
         if (isAxiosError) {

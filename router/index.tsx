@@ -18,7 +18,7 @@ import { init } from '../bootstrap';
 import { Host } from 'react-native-portalize';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SelectProfile } from '@/screens/stack';
-import { useQueries } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Token } from '@/const';
 import { api } from '@/apis';
@@ -31,38 +31,24 @@ init();
 
 export function Router(): JSX.Element {
   const { login } = useUserStore();
-  const [
-    { data: me, isLoading: isMeLoading },
-    { isLoading: isProfilesLoading },
-  ] = useQueries({
-    queries: [
-      {
-        queryKey: ['check', 'login'],
-        queryFn: async () => {
-          const token = await AsyncStorage.getItem(Token.ACT);
-          if (!token) return false;
-          const meResponse = await api.getMe();
-          if (meResponse.data) {
-            login(meResponse.data);
-          }
-          return meResponse.data;
-        },
-      },
-      {
-        queryKey: ['profiles'],
-        queryFn: async () => {
-          const res = await api.getMyProfileList();
-          return res.data;
-        },
-      },
-    ],
+  const { data: me, isLoading: isMeLoading } = useQuery({
+    queryKey: ['check', 'login'],
+    queryFn: async () => {
+      const token = await AsyncStorage.getItem(Token.ACT);
+      if (!token) return false;
+      const meResponse = await api.getMe();
+      if (meResponse.data) {
+        login(meResponse.data);
+      }
+      return meResponse.data;
+    },
   });
 
   useEffect(() => {
-    if (!isMeLoading && !isProfilesLoading) {
+    if (!isMeLoading) {
       SplashScreen.hide();
     }
-  }, [isMeLoading, isProfilesLoading]);
+  }, [isMeLoading]);
 
   return (
     <SafeAreaProvider style={{ flex: 1 }}>
@@ -70,34 +56,9 @@ export function Router(): JSX.Element {
         <GestureHandlerRootView>
           <Host>
             <NavigationContainer>
-              {me ? (
-                <Stack.Navigator
-                  initialRouteName={
-                    me.latestProfileId ? 'shell' : 'select-profile'
-                  }
-                  screenOptions={{
-                    headerShown: false,
-                  }}>
-                  <Stack.Screen
-                    name="select-profile"
-                    options={{
-                      headerShown: true,
-                      headerTransparent: true,
-
-                      title: '??',
-                      headerLeft(props) {
-                        return (
-                          <Pressable>
-                            <CloseIcon size={25} />
-                          </Pressable>
-                        );
-                      },
-                    }}
-                    component={SelectProfile}
-                  />
-                  <Stack.Screen name="shell" component={TabNavigator} />
-                </Stack.Navigator>
-              ) : (
+              {isMeLoading ? (
+                <></>
+              ) : !me ? (
                 <Stack.Navigator
                   initialRouteName="Login"
                   screenOptions={{ headerShown: false }}>
@@ -113,6 +74,32 @@ export function Router(): JSX.Element {
                   />
                   <Stack.Screen name="SelectPhoto" component={SelectPhoto} />
                   <Stack.Screen name="SelectBreeds" component={SelectBreeds} />
+                </Stack.Navigator>
+              ) : (
+                <Stack.Navigator
+                  initialRouteName={
+                    me.latestProfileId ? 'shell' : 'select-profile'
+                  }
+                  screenOptions={{
+                    headerShown: false,
+                  }}>
+                  <Stack.Screen
+                    name="select-profile"
+                    options={{
+                      headerShown: true,
+                      headerTransparent: true,
+                      title: '',
+                      headerLeft(props) {
+                        return (
+                          <Pressable>
+                            <CloseIcon size={25} />
+                          </Pressable>
+                        );
+                      },
+                    }}
+                    component={SelectProfile}
+                  />
+                  <Stack.Screen name="shell" component={TabNavigator} />
                 </Stack.Navigator>
               )}
             </NavigationContainer>

@@ -121,14 +121,20 @@ class PoopApi {
           try {
             const refreshToken = await AsyncStorage.getItem(Token.RFT);
             if (refreshToken) {
-              const res = await PoopApi.instance.post('/v1/auth/refresh', {
-                refreshToken,
-              });
-              const { accessToken: newAccessToken } = res.data;
-              this.setAccessToken(newAccessToken);
-              await AsyncStorage.setItem(Token.ACT, accessToken);
-              PoopApi.instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-              return PoopApi.instance.request(error.config);
+              try {
+                const res = await PoopApi.instance.post('/v1/auth/refresh', {
+                  refreshToken,
+                });
+                const { accessToken: newAccessToken } = res.data;
+                this.setAccessToken(newAccessToken);
+                await AsyncStorage.setItem(Token.ACT, accessToken);
+                PoopApi.instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+                return PoopApi.instance.request(error.config);
+              } catch (refreshError) {
+                await AsyncStorage.removeItem(Token.ACT);
+                await AsyncStorage.removeItem(Token.RFT);
+                return Promise.reject(refreshError);
+              }
             }
           } catch (refreshError: any) {
             if (refreshError?.status! === 401) {
