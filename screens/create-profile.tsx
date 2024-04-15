@@ -32,7 +32,7 @@ import { useImageStore } from '@/store/use-image';
 
 import * as z from 'zod';
 import { RadioContextProvider } from '@/components/ui/radio-button/radio-button-group';
-import { RadioButton } from '@/components/ui/radio-button/radio.button';
+import { RadioButton } from '@/components/ui/radio-button/radio-button';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input } from '@/components/ui';
 import useCreateProfile from '@/hooks/profile/useCreateProfile';

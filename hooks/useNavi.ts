@@ -14,6 +14,7 @@ export type RootStackParam = {
   SuccessSignup: undefined;
   SelectPhoto: undefined;
   SelectBreeds: undefined;
+  shell: undefined;
   'select-profile': undefined;
 };
 

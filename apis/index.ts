@@ -44,6 +44,18 @@ class PoopApi {
 
   // Profile
 
+  async loginProfile(profileId: string) {
+    const { data } = await PoopApi.handler<Response<boolean>>({
+      method: 'POST',
+      url: '/v1/profiles',
+      data: {
+        profileId,
+      },
+    });
+
+    return data;
+  }
+
   async createProfile(form: FormData) {
     const { data } = await PoopApi.handler({
       method: 'PUT',
@@ -114,6 +126,7 @@ class PoopApi {
 
   injectInterceptor(accessToken: string) {
     this.setAccessToken(accessToken);
+
     PoopApi.instance.interceptors.response.use(
       response => response,
       async error => {
@@ -122,9 +135,12 @@ class PoopApi {
             const refreshToken = await AsyncStorage.getItem(Token.RFT);
             if (refreshToken) {
               try {
-                const res = await PoopApi.instance.post('/v1/auth/refresh', {
-                  refreshToken,
-                });
+                const url = new URL(PoopApi.instance.defaults.baseURL!);
+                // FIXME
+                url.pathname = '/v1/auth/refresh';
+                const res = await fetch(url, {
+                  body: JSON.stringify({ refreshToken }),
+                }).then(response => response.json());
                 const { accessToken: newAccessToken } = res.data;
                 this.setAccessToken(newAccessToken);
                 await AsyncStorage.setItem(Token.ACT, accessToken);

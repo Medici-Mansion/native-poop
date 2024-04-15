@@ -1,19 +1,27 @@
 import { api } from '@/apis';
-import { useQuery } from '@tanstack/react-query';
-import React from 'react';
-import {
-  FlatList,
-  Image,
-  Pressable,
-  PressableProps,
-  Text,
-  View,
-} from 'react-native';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import React, { useCallback } from 'react';
+import { FlatList, Image, Text, View } from 'react-native';
 import { useHeaderHeight } from '@react-navigation/elements';
-import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 import { GetMyProfiles } from '@/types/server/profile';
+import { Field, Form } from 'houseform';
+import { RadioContextProvider } from '@/components/ui/radio-button/radio-button-group';
+import { RadioButtonItem } from '@/components/ui/radio-button/radio-button';
+import Icon from '@/components/icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AnimatedPressable } from '@/components/ui/animate-pressable';
+import { useNavi } from '@/hooks/useNavi';
 export const SelectProfile = () => {
+  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
+  const { navigation } = useNavi();
+  const { mutate } = useMutation({
+    mutationKey: ['login', 'profile'],
+    mutationFn: api.loginProfile,
+    onSuccess() {
+      navigation.replace('shell');
+    },
+  });
   const { data } = useQuery({
     queryKey: ['profiles'],
     queryFn: async () => {
@@ -21,56 +29,63 @@ export const SelectProfile = () => {
       return res.data;
     },
   });
+
+  const onValid = useCallback(
+    ({ profileId }: { profileId: string }) => {
+      console.log(profileId);
+      mutate(profileId);
+    },
+    [mutate],
+  );
+
   return (
-    <View
-      className="bg-black flex-1 px-4"
-      style={{ paddingTop: headerHeight + 18 }}>
-      <Text className="text-head-sb24 text-white mb-16">
-        프로필을 선택해주세요
-      </Text>
-      <FlatList
-        data={data}
-        renderItem={profile => <AvatarButton profile={profile.item} />}
-      />
-    </View>
+    <Form onSubmit={onValid}>
+      {({ submit, isDirty }) => (
+        <View
+          className="bg-black flex-1 px-4 justify-end"
+          style={{
+            paddingTop: headerHeight + 18,
+            paddingBottom: insets.bottom,
+          }}>
+          <Text className="text-head-sb24 text-white mb-16">
+            프로필을 선택해주세요
+          </Text>
+          <Field name="profileId">
+            {({ setValue, value }) => (
+              <RadioContextProvider onChangeValue={setValue}>
+                <FlatList
+                  data={data}
+                  renderItem={profile => (
+                    <RadioButtonItem
+                      className="rounded-3xl h-[84] bg-gray-500 justify-center p-6"
+                      value={profile.item.id}>
+                      <AvatarButton
+                        profile={profile.item}
+                        active={value === profile.item.id}
+                      />
+                    </RadioButtonItem>
+                  )}
+                />
+              </RadioContextProvider>
+            )}
+          </Field>
+          <AnimatedPressable onPress={submit} className="ml-auto">
+            <Icon name={isDirty ? 'ArrowActive' : 'ArrowInactive'} />
+          </AnimatedPressable>
+        </View>
+      )}
+    </Form>
   );
 };
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-interface AvatarButtonProps extends PressableProps {
+interface AvatarButtonProps {
   profile: GetMyProfiles;
+  active?: boolean;
 }
 
-function AvatarButton({ profile, ...props }: AvatarButtonProps) {
-  const opacity = useSharedValue(1);
-  const scale = useSharedValue(1);
-
-  const handlePressIn = () => {
-    opacity.value = withSpring(0.8);
-    scale.value = withSpring(0.98, {
-      damping: 10,
-    });
-  };
-
-  const handlePressOut = () => {
-    opacity.value = withSpring(1);
-    scale.value = withSpring(1);
-  };
-
+function AvatarButton({ profile, active }: AvatarButtonProps) {
   return (
-    <AnimatedPressable
-      key={profile.id}
-      style={[{ opacity, transform: [{ scale }] }, props.style]}
-      onPressIn={event => {
-        handlePressIn();
-        props.onPressIn && props.onPressIn(event);
-      }}
-      onPressOut={event => {
-        handlePressOut();
-        props.onPressOut && props.onPressOut(event);
-      }}
-      className="rounded-3xl h-[84] bg-gray-500 justify-center p-6">
+    <View className="flex-row justify-between items-center">
       <View className="flex-row items-center space-x-4">
         <Image
           source={{
@@ -80,6 +95,10 @@ function AvatarButton({ profile, ...props }: AvatarButtonProps) {
         />
         <Text className="text-white text-head-sb14">{profile.name}</Text>
       </View>
-    </AnimatedPressable>
+      <Icon
+        name={active ? 'CheckActive' : 'CheckInactive'}
+        color={active ? 'white' : 'gray'}
+      />
+    </View>
   );
 }
