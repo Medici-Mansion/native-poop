@@ -1,3 +1,5 @@
+import { Gender } from '@/types';
+import { forwardRef } from 'react';
 import { Image, ImageProps } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import IonicIcon from 'react-native-vector-icons/Ionicons';
@@ -53,9 +55,15 @@ export const HomeTabIcon = () => (
   <MaterialIcon name="home-variant" size={20} color="white" />
 );
 
-export const GenderIcon = ({ gender }: { gender: boolean }) => (
+export const GenderIcon = ({ gender }: { gender: Gender }) => (
   <MaterialIcon
-    name={gender ? 'gender-female' : 'gender-male'}
+    name={
+      gender === Gender.FEMALE
+        ? 'gender-female'
+        : gender === Gender.MALE
+        ? 'gender-male'
+        : 'none'
+    }
     size={16}
     color={gender ? 'red' : '#397DFF'}
   />
@@ -74,9 +82,9 @@ export const LogoImage = () => (
   />
 );
 
-export const PlusIcon = () => (
-  <Icon name="pluscircleo" size={20} color="white" />
-);
+export const PlusIcon = forwardRef<Icon>((props, ref) => (
+  <Icon ref={ref} name="pluscircleo" size={20} color="white" />
+));
 
 export const SettingIcon = () => (
   <Image

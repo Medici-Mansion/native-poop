@@ -25,6 +25,7 @@ import { api } from '@/apis';
 import TabNavigator from './tab-navigator';
 import { Pressable } from 'react-native';
 import { CloseIcon } from '@/assets/icons';
+import { UploadStackScreen } from '@/screens/stack/upload-toon';
 
 const Stack = createNativeStackNavigator();
 init();
@@ -89,17 +90,19 @@ export function Router(): JSX.Element {
                       headerShown: true,
                       headerTransparent: true,
                       title: '',
-                      headerLeft(props) {
-                        return (
-                          <Pressable>
-                            <CloseIcon size={25} />
-                          </Pressable>
-                        );
-                      },
+                      headerLeft: () => (
+                        <Pressable>
+                          <CloseIcon size={25} />
+                        </Pressable>
+                      ),
                     }}
                     component={SelectProfile}
                   />
                   <Stack.Screen name="shell" component={TabNavigator} />
+                  <Stack.Screen
+                    name="create-post"
+                    component={UploadStackScreen}
+                  />
                 </Stack.Navigator>
               )}
             </NavigationContainer>

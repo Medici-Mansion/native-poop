@@ -1,5 +1,5 @@
 import { api } from '@/apis';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
 import { FlatList, Image, Text, View } from 'react-native';
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -11,14 +11,18 @@ import Icon from '@/components/icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AnimatedPressable } from '@/components/ui/animate-pressable';
 import { useNavi } from '@/hooks/useNavi';
+
 export const SelectProfile = () => {
+  const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { navigation } = useNavi();
   const { mutate } = useMutation({
     mutationKey: ['login', 'profile'],
     mutationFn: api.loginProfile,
-    onSuccess() {
+    async onSuccess() {
+      const latestProfileResponse = await api.getLatestProfile();
+      queryClient.setQueryData(['profile', 'latest'], latestProfileResponse);
       navigation.replace('shell');
     },
   });

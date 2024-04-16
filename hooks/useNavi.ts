@@ -1,6 +1,5 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ReactNode } from 'react';
 
 export type RootStackParam = {
   Home: undefined;
@@ -16,6 +15,7 @@ export type RootStackParam = {
   SelectBreeds: undefined;
   shell: undefined;
   'select-profile': undefined;
+  'create-post': { type: 'toon' | 'challenge' };
 };
 
 export const useNavi = () => {

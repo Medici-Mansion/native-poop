@@ -1,12 +1,21 @@
 import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavi } from '@/hooks/useNavi';
 import { GenderIcon, NotificationIcon } from '@/assets/icons';
 import ImagePicker from 'react-native-image-crop-picker';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/apis';
 
 const UserInfo = () => {
-  const [gender] = useState(true);
   const { navigation } = useNavi();
+
+  const { data } = useQuery({
+    queryKey: ['profile', 'latest'],
+    queryFn: api.getLatestProfile,
+    select(response) {
+      return response.data;
+    },
+  });
 
   const openPicker = () => {
     ImagePicker.openPicker({
@@ -23,27 +32,28 @@ const UserInfo = () => {
     <View
       className="flex flex-row bg-black justify-between px-5 py-5"
       style={{ flex: 1 }}>
-      <View className=" lex flex-row items-center gap-3">
-        <View className="rounded-full">
-          <Image
-            source={require('../assets/images/profile.png')}
-            className="w-12 h-12"
-          />
+      {data ? (
+        <View className=" lex flex-row items-center gap-3">
+          {data?.avatarUrl && (
+            <View className="rounded-full overflow-hidden">
+              <Image source={{ uri: data.avatarUrl }} className="w-12 h-12" />
+            </View>
+          )}
+          <View className="flex flex-row items-center justify-center">
+            <Text className="text-white text-md">{data?.name}</Text>
+            <GenderIcon gender={data.gender} />
+          </View>
+          <Pressable
+            onPress={() =>
+              navigation.navigate('UserDetail', {
+                id: 1,
+                title: 'asdf',
+              })
+            }>
+            <Text style={styles.follow}>팔로우</Text>
+          </Pressable>
         </View>
-        <View className="flex flex-row items-center justify-center">
-          <Text className="text-white text-md">{'꼼데'}</Text>
-          <GenderIcon gender={gender} />
-        </View>
-        <Pressable
-          onPress={() =>
-            navigation.navigate('UserDetail', {
-              id: 1,
-              title: 'asdf',
-            })
-          }>
-          <Text style={styles.follow}>팔로우</Text>
-        </Pressable>
-      </View>
+      ) : null}
       <Pressable
         className="bg-black flex items-center justify-center"
         onPress={() => openPicker()}>

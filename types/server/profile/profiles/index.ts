@@ -1,3 +1,5 @@
+import { Gender } from '@/types';
+
 export interface GetMyProfiles {
   id: string;
   createdAt: string;
@@ -5,7 +7,7 @@ export interface GetMyProfiles {
   avatarUrl?: string;
   name: string;
   birthday: string;
-  gender: string;
+  gender: Gender;
   breedId: string;
   isLatestLoginProfile: boolean;
 }

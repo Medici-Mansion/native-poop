@@ -44,6 +44,15 @@ class PoopApi {
 
   // Profile
 
+  async getLatestProfile() {
+    const { data } = await PoopApi.handler<Response<GetMyProfiles>>({
+      method: 'GET',
+      url: '/v1/profiles/latest',
+    });
+
+    return data;
+  }
+
   async loginProfile(profileId: string) {
     const { data } = await PoopApi.handler<Response<boolean>>({
       method: 'POST',

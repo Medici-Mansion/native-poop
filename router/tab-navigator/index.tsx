@@ -1,16 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '@/screens/home';
-import UploadScreen from '@/screens/upload';
 import Settings from '@/screens/settings';
 import SearchScreen from '@/screens/search';
-import {
-  HomeTabIcon,
-  ListIcon,
-  PlusIcon,
-  SearchIcon,
-  SettingIcon,
-} from '@/assets/icons';
+import { HomeTabIcon, ListIcon, SearchIcon, SettingIcon } from '@/assets/icons';
 import ListScreen from '@/screens/list';
+
+import { UploadButton } from '@/router/tab-navigator/tab-icon';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,6 +18,7 @@ const TabNavigator = () => {
         tabBarShowLabel: false,
         tabBarStyle: { backgroundColor: 'black' },
         tabBarActiveTintColor: 'black',
+        headerTransparent: true,
       }}>
       <Tab.Screen
         name="Home"
@@ -40,12 +36,18 @@ const TabNavigator = () => {
           tabBarIcon: SearchIcon,
         }}
       />
+
       <Tab.Screen
         name="Upload"
-        component={UploadScreen}
+        component={Noop}
+        listeners={({}) => ({
+          tabPress: event => {
+            event.preventDefault();
+          },
+        })}
         options={{
           title: 'Upload',
-          tabBarIcon: PlusIcon,
+          tabBarIcon: UploadButton,
         }}
       />
       <Tab.Screen
@@ -69,3 +71,5 @@ const TabNavigator = () => {
 };
 
 export default TabNavigator;
+
+const Noop = () => null;
