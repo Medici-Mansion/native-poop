@@ -87,7 +87,6 @@ export function Router(): JSX.Element {
                   <Stack.Screen
                     name="select-profile"
                     options={{
-                      headerShown: true,
                       headerTransparent: true,
                       title: '',
                       headerLeft: () => (
