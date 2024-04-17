@@ -7,15 +7,18 @@ import { AnimatedPressable } from '../animate-pressable';
 export const RadioButton = ({
   value,
   label,
+  disabled,
 }: {
   value: string;
   label: string;
+  disabled?: boolean;
 }) => {
   const radioContext = useContext(RadioContext);
 
   if (!radioContext) throw new Error('Radiocontext must be declared');
   return (
     <CheckBox
+      disabled={disabled}
       checked={radioContext.selected === value}
       onPress={() => radioContext.setSelected(value)}
       iconType="material-community"

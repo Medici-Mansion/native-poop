@@ -119,7 +119,7 @@ const SignUpScreen = () => {
             <BackHandler />
           </Pressable>
           <Text className="text-white font-bold text-2xl">
-            {SignupFormList[step].title || ''}
+            {SignupFormList[step]?.title || ''}
           </Text>
           {step === 6 && (
             <Form

@@ -18,6 +18,7 @@ interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
   hint?: string;
+  disabled?: boolean;
   onOuterPressIn?: (event: GestureResponderEvent) => void;
 }
 
@@ -25,6 +26,7 @@ export const Input = ({
   label,
   error,
   hint,
+  disabled,
   onOuterPressIn,
   ...props
 }: InputProps) => {
@@ -38,6 +40,7 @@ export const Input = ({
 
   return (
     <Pressable
+      disabled={disabled}
       className="space-y-4 relative"
       onPressIn={event => {
         onOuterPressIn && onOuterPressIn(event);

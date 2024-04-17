@@ -66,7 +66,7 @@ class PoopApi {
   }
 
   async createProfile(form: FormData) {
-    const { data } = await PoopApi.handler({
+    const { data } = await PoopApi.handler<Response<boolean>>({
       method: 'PUT',
       url: '/v1/profiles',
       data: form,
@@ -97,10 +97,11 @@ class PoopApi {
     return data;
   }
 
-  async verify() {
+  async verify(body: VerifyParam) {
     const { data } = await PoopApi.handler({
       method: 'POST',
       url: '/v1/auth/verify',
+      data: body,
     });
 
     return data;

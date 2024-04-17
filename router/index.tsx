@@ -13,12 +13,11 @@ import SuccessSignup from '@/screens/success-signup';
 
 import CreateProfile from '@/screens/create-profile';
 import SelectPhoto from '@/screens/select-photo';
-import SelectBreeds from '@/screens/select-breeds';
 import { init } from '../bootstrap';
 import { Host } from 'react-native-portalize';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SelectProfile } from '@/screens/stack';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Token } from '@/const';
 import { api } from '@/apis';
@@ -32,6 +31,15 @@ init();
 
 export function Router(): JSX.Element {
   const { login } = useUserStore();
+  const queryClient = useQueryClient();
+  const { data: profiles } = useQuery({
+    queryKey: ['profiles'],
+    queryFn: async () => {
+      const res = await api.getMyProfileList();
+      return res.data;
+    },
+    enabled: false,
+  });
   const { data: me, isLoading: isMeLoading } = useQuery({
     queryKey: ['check', 'login'],
     queryFn: async () => {
@@ -39,11 +47,15 @@ export function Router(): JSX.Element {
       if (!token) return false;
       const meResponse = await api.getMe();
       if (meResponse.data) {
+        const profileList = await api.getMyProfileList();
+        queryClient.setQueryData(['profiles'], profileList.data);
         login(meResponse.data);
       }
       return meResponse.data;
     },
   });
+
+  useEffect(() => {}, []);
 
   useEffect(() => {
     if (!isMeLoading) {
@@ -52,16 +64,16 @@ export function Router(): JSX.Element {
   }, [isMeLoading]);
 
   return (
-    <SafeAreaProvider style={{ flex: 1 }}>
+    <SafeAreaProvider style={{ flex: 1, backgroundColor: 'black' }}>
       <PaperProvider>
         <GestureHandlerRootView>
           <Host>
             <NavigationContainer>
-              {isMeLoading ? (
-                <></>
-              ) : !me ? (
+              {isMeLoading ? null : !me || (me && !profiles?.length) ? (
                 <Stack.Navigator
-                  initialRouteName="Login"
+                  initialRouteName={
+                    me && !profiles?.length ? 'SuccessSignup' : 'Login'
+                  }
                   screenOptions={{ headerShown: false }}>
                   <Stack.Screen
                     name="CreateProfile"
@@ -74,7 +86,6 @@ export function Router(): JSX.Element {
                     component={SuccessSignup}
                   />
                   <Stack.Screen name="SelectPhoto" component={SelectPhoto} />
-                  <Stack.Screen name="SelectBreeds" component={SelectBreeds} />
                 </Stack.Navigator>
               ) : (
                 <Stack.Navigator

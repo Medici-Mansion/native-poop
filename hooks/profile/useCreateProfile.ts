@@ -1,20 +1,12 @@
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
-import { ApiResponse, SuccessCreateProfileRes } from '@/types';
 import { AxiosError } from 'axios';
 import { api } from '@/apis';
+import { Response } from '@/types/server';
 
 const useCreateProfile = (
-  options?: UseMutationOptions<
-    ApiResponse<SuccessCreateProfileRes>,
-    AxiosError,
-    FormData
-  >,
+  options?: UseMutationOptions<Response<boolean>, AxiosError, FormData>,
 ) => {
-  const { mutate, data, isSuccess, isPending, error } = useMutation<
-    ApiResponse<SuccessCreateProfileRes>,
-    AxiosError,
-    FormData
-  >({
+  const { mutate, data, isSuccess, isPending, error } = useMutation({
     mutationKey: ['create-profile'],
     mutationFn: api.createProfile,
     ...(options ?? {}),

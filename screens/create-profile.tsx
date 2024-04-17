@@ -7,7 +7,6 @@ import {
   Text,
   TextInput,
   View,
-  Button,
   ScrollView,
 } from 'react-native';
 import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
@@ -37,6 +36,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input } from '@/components/ui';
 import useCreateProfile from '@/hooks/profile/useCreateProfile';
 import { Portal } from 'react-native-portalize';
+import { cn } from '@/lib/utils';
+import { AnimatedPressable } from '@/components/ui/animate-pressable';
+import { useQueryClient } from '@tanstack/react-query';
 
 const PAGE_WIDTH = 35;
 const PAGE_HEIGHT = 50;
@@ -55,15 +57,29 @@ const schema = z.object({
 
 const CreateProfile = () => {
   const r = useRef<ICarouselInstance>(null);
-  const { mutate: createProfileMutate } = useCreateProfile({
-    onSuccess: data => {
-      console.log(data, '<<<<');
-    },
-    onError: err => {
-      console.log({ err });
-      console.log(err.response?.data);
-    },
-  });
+  const queryClient = useQueryClient();
+
+  const { mutate: createProfileMutate, isPending: createPending } =
+    useCreateProfile({
+      onSuccess: async data => {
+        // TODO: 프로필 생성 성공으로 홈화면으로 이동
+        if (data.data) {
+          await queryClient.invalidateQueries({
+            exact: true,
+            queryKey: ['check', 'login'],
+          });
+          await queryClient.invalidateQueries({
+            exact: true,
+            queryKey: ['profiles'],
+          });
+          // mutate(profileList.data[0].id);
+        }
+      },
+      onError: err => {
+        console.log({ err });
+        console.log(err.response?.data);
+      },
+    });
   const { navigation } = useNavi();
   const width = Dimensions.get('window').width;
   const [picker, setPicker] = useState(false);
@@ -87,7 +103,6 @@ const CreateProfile = () => {
   const { image } = useImageStore();
 
   const onValid = (value: z.infer<typeof schema>) => {
-    console.log({ value }, image);
     const { birthday, breed, gender, name } = value;
     if (!image || !birthday || !gender || !breed.id || !name) {
       console.log('field required');
@@ -105,20 +120,9 @@ const CreateProfile = () => {
     formData.append('name', name);
 
     createProfileMutate(formData);
-    // RNFetchBlob.fetch('GET', image.uri)
-    //   .then(res => res.base64())
-    //   .then(base64 => {
-    //     console.log(base64, '<<<blob');
-
-    //   })
-    //   .catch(e => console.log(e));
-    // fetch(image)
-    //   .then(res => res.blob())
-    //   .then(blob => {
-    //   ;
-    //   })
-    //   .catch(e => console.log(e));
   };
+
+  const isPending = createPending;
 
   return (
     <Form onSubmit={onValid}>
@@ -137,15 +141,21 @@ const CreateProfile = () => {
               <Pressable onPress={() => navigation.push('Login')}>
                 <CloseIcon size={25} />
               </Pressable>
-              <Button
-                disabled={!isAllFieldValid || !isValid}
-                title={`${isAllFieldValid && isValid}`}
-                color="white"
-                onPress={submit}
-              />
+              <AnimatedPressable
+                disabled={isPending || !isAllFieldValid || !isValid}
+                onPress={submit}>
+                <Text
+                  className={cn(
+                    'text-body-b16 text-white font-bold',
+                    (!isAllFieldValid || !isValid) && 'text-gray-200',
+                  )}>
+                  등록
+                </Text>
+              </AnimatedPressable>
             </View>
             <View className="flex items-center justify-center py-16">
               <Pressable
+                disabled={isPending}
                 className="rounded-full bg-[#1C1C1C] w-24 h-24 items-center justify-center overflow-hidden relative"
                 onPress={async () => {
                   let permission = false;
@@ -184,6 +194,7 @@ const CreateProfile = () => {
                   {({ value, setValue, onBlur, errors, hints }) => {
                     return (
                       <Input
+                        disabled={isPending}
                         label={ProfileFormList[0].title}
                         value={value}
                         onBlur={onBlur}
@@ -201,7 +212,7 @@ const CreateProfile = () => {
                   }}
                 </Field>
               </View>
-              <Pressable>
+              <Pressable disabled={isPending}>
                 <Field
                   name={'birthday'}
                   onChangeValidate={z.string().min(1)}
@@ -209,6 +220,7 @@ const CreateProfile = () => {
                   {({ value, setValue, onBlur, errors }) => (
                     <>
                       <Input
+                        disabled={isPending}
                         onOuterPressIn={() => setPicker(true)}
                         label={ProfileFormList[1].title}
                         onPressIn={() => setPicker(true)}
@@ -223,6 +235,7 @@ const CreateProfile = () => {
                         {picker && (
                           <View className="absolute bottom-0 w-screen">
                             <Pressable
+                              disabled={isPending}
                               onPress={() => {
                                 setPicker(false);
                               }}>
@@ -259,8 +272,12 @@ const CreateProfile = () => {
                   {({ value, setValue }) => (
                     <>
                       <Input
+                        disabled={isPending}
                         onOuterPressIn={() => {
-                          console.log('???????');
+                          setIsBreedsVisible(true);
+                          showBottomSheet();
+                        }}
+                        onPressIn={() => {
                           setIsBreedsVisible(true);
                           showBottomSheet();
                         }}
@@ -341,6 +358,7 @@ const CreateProfile = () => {
                     <View className="flex flex-row py-5">
                       {genders.map(gender => (
                         <RadioButton
+                          disabled={isPending}
                           key={gender.value}
                           label={gender.label}
                           value={gender.value}

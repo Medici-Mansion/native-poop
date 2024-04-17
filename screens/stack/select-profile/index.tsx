@@ -36,7 +36,6 @@ export const SelectProfile = () => {
 
   const onValid = useCallback(
     ({ profileId }: { profileId: string }) => {
-      console.log(profileId);
       mutate(profileId);
     },
     [mutate],
@@ -48,7 +47,7 @@ export const SelectProfile = () => {
         <View
           className="bg-black flex-1 px-4 justify-end"
           style={{
-            paddingTop: headerHeight + 18,
+            paddingTop: insets.top + headerHeight + 18,
             paddingBottom: insets.bottom,
           }}>
           <Text className="text-head-sb24 text-white mb-16">
