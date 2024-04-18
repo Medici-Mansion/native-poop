@@ -22,7 +22,9 @@ export const SelectProfile = () => {
     mutationFn: api.loginProfile,
     async onSuccess() {
       const latestProfileResponse = await api.getLatestProfile();
-      queryClient.setQueryData(['profile', 'latest'], latestProfileResponse);
+      queryClient.setQueryData(['profile', 'latest'], latestProfileResponse, {
+        updatedAt: new Date().getTime(),
+      });
       navigation.replace('shell');
     },
   });

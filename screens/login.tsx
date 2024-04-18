@@ -23,8 +23,10 @@ import { z } from 'zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '@/apis';
 import { useQueryClient } from '@tanstack/react-query';
+import { useSafeAreaStyle } from '@/hooks/useSafeAreaStyle';
 
 const LoginScreen = () => {
+  const insets = useSafeAreaStyle();
   const { mutateAsync, isPending } = useLogin();
   const { hideBottomSheet, ref, showBottomSheet, snapPoints } =
     useBottomSheet('50%');
@@ -57,7 +59,10 @@ const LoginScreen = () => {
           return navigation.replace('CreateProfile');
         }
 
-        queryClient.setQueryData(['profiles'], response.data);
+        queryClient.setQueryData(['profiles'], response.data, {
+          updatedAt: new Date().getTime(),
+        });
+
         /**
          * @TODO
          * @description 프로필 목록이 존재할 경우
@@ -80,7 +85,7 @@ const LoginScreen = () => {
     });
   };
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <GestureHandlerRootView style={[styles.container, insets]}>
       <Pressable onPress={() => Keyboard.dismiss()} style={styles.logoWrapper}>
         <Image
           source={require('../assets/images/logo.png')}

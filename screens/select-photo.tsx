@@ -21,7 +21,7 @@ const SelectPhoto = () => {
   const getPhotos = async () => {
     const { edges, page_info } = await CameraRoll.getPhotos({
       first: 10,
-      assetType: 'Photos',
+      assetType: 'All',
       include: ['filename', 'fileSize', 'fileExtension', 'sourceType'],
     });
 

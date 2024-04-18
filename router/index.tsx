@@ -48,14 +48,14 @@ export function Router(): JSX.Element {
       const meResponse = await api.getMe();
       if (meResponse.data) {
         const profileList = await api.getMyProfileList();
-        queryClient.setQueryData(['profiles'], profileList.data);
+        queryClient.setQueryData(['profiles'], profileList.data, {
+          updatedAt: new Date().getTime(),
+        });
         login(meResponse.data);
       }
       return meResponse.data;
     },
   });
-
-  useEffect(() => {}, []);
 
   useEffect(() => {
     if (!isMeLoading) {
