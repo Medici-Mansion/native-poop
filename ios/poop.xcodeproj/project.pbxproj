@@ -36,6 +36,7 @@
 		7F0C761E2BC845D6001D8071 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C819FC372B720DD1005DB7B7 /* SimpleLineIcons.ttf */; };
 		7F0C761F2BC845D6001D8071 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C819FC382B720DD1005DB7B7 /* Zocial.ttf */; };
 		7F19CBC12BC77B0500C5A03B /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 7F19CBC02BC77B0500C5A03B /* Fonts */; };
+		7F4579162BD0B447003E5F73 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4579152BD0B447003E5F73 /* logo.png */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		820E3C4946E447C9980FAD65 /* Pretendard-ExtraLight.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 5B8ED0ED56A64B84ABC7B6A5 /* Pretendard-ExtraLight.woff2 */; };
 		821605C3A1264172B6F0DF70 /* Pretendard-Regular.woff2 in Resources */ = {isa = PBXBuildFile; fileRef = 7D299667D4274091894C7922 /* Pretendard-Regular.woff2 */; };
@@ -95,6 +96,7 @@
 		5DCACB8F33CDC322A6C60F78 /* libPods-poop.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-poop.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D299667D4274091894C7922 /* Pretendard-Regular.woff2 */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Regular.woff2"; path = "../assets/fonts/pretendard/Pretendard-Regular.woff2"; sourceTree = "<group>"; };
 		7F19CBC02BC77B0500C5A03B /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
+		7F4579152BD0B447003E5F73 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 		817C4965C2B14AB69127D416 /* Pretendard-Black.woff2 */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Black.woff2"; path = "../assets/fonts/pretendard/Pretendard-Black.woff2"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = poop/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-poop-poopTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-poop-poopTests.release.xcconfig"; path = "Target Support Files/Pods-poop-poopTests/Pods-poop-poopTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -184,6 +186,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		7F4579142BD0B434003E5F73 /* Splash */ = {
+			isa = PBXGroup;
+			children = (
+				7F4579152BD0B447003E5F73 /* logo.png */,
+			);
+			name = Splash;
+			sourceTree = "<group>";
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -257,6 +267,7 @@
 		E8493681E2DD4D5789B0EB7C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7F4579142BD0B434003E5F73 /* Splash */,
 				817C4965C2B14AB69127D416 /* Pretendard-Black.woff2 */,
 				A463875F174F46909789E3C7 /* Pretendard-Bold.woff2 */,
 				49430FF6B97B4175A9A5497C /* Pretendard-ExtraBold.woff2 */,
@@ -322,7 +333,8 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1210;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
@@ -395,6 +407,7 @@
 				7F0C76162BC845D6001D8071 /* FontAwesome6_Regular.ttf in Resources */,
 				7F0C76172BC845D6001D8071 /* FontAwesome6_Solid.ttf in Resources */,
 				7F0C76182BC845D6001D8071 /* Fontisto.ttf in Resources */,
+				7F4579162BD0B447003E5F73 /* logo.png in Resources */,
 				7F0C76192BC845D6001D8071 /* Foundation.ttf in Resources */,
 				7F0C761A2BC845D6001D8071 /* Ionicons.ttf in Resources */,
 				7F0C761B2BC845D6001D8071 /* MaterialCommunityIcons.ttf in Resources */,
@@ -602,6 +615,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-poop-poopTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -629,6 +643,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-poop-poopTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = poopTests/Info.plist;
@@ -654,10 +669,12 @@
 			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-poop.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3XU5VHUK72;
 				ENABLE_BITCODE = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Pods/hermes-engine/destroot/Library/Frameworks/macosx",
@@ -686,9 +703,11 @@
 			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-poop.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3XU5VHUK72;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Pods/hermes-engine/destroot/Library/Frameworks/macosx",
@@ -744,6 +763,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -761,7 +781,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -780,10 +800,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -822,6 +839,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -835,7 +853,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -853,10 +871,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
