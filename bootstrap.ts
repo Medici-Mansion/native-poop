@@ -86,9 +86,9 @@ export async function init() {
     },
   });
 
-  const act = await AsyncStorage.getItem(Token.ACT);
+  const accessToken = await AsyncStorage.getItem(Token.ACT);
 
-  if (act) {
-    api.injectInterceptor(act);
+  if (accessToken) {
+    await api.injectInterceptor({ accessToken, refresh: true });
   }
 }

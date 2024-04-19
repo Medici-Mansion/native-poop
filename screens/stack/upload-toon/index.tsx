@@ -12,11 +12,19 @@ import { RootStackParam } from '@/hooks/useNavi';
 import { AnimatedPressable } from '@/components/ui/animate-pressable';
 import Icon from '@/components/icons';
 import { Form, useFormContext } from 'houseform';
-import { Image, View } from 'react-native';
+import {
+  Image,
+  LayoutAnimation,
+  Platform,
+  UIManager,
+  View,
+} from 'react-native';
+import Video from 'react-native-video';
 import {
   BottomTabNavigationEventMap,
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
+import { useLayoutEffect } from 'react';
 
 const UploadStack = createNativeStackNavigator();
 
@@ -56,34 +64,93 @@ export const UploadStackScreen = () => {
   );
 };
 
-interface UploadTabBarProps {
+export interface UploadTabBarProps {
   navigation: NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>;
+}
+
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 const UploadTabBar = ({ navigation }: UploadTabBarProps) => {
   const {
     value: { images },
   } = useFormContext<UploadToonParam>();
-  return images?.length ? (
+
+  useLayoutEffect(() => {
+    LayoutAnimation.configureNext({
+      duration: 500,
+      create: {
+        type: 'spring',
+        property: 'opacity',
+        duration: 350,
+        springDamping: 700,
+      },
+      update: {
+        type: 'spring',
+        springDamping: 700,
+      },
+      delete: {
+        type: 'spring',
+        property: 'opacity',
+        duration: 350,
+        springDamping: 700,
+      },
+    });
+  }, [images]);
+  return (
     <View className="p-4 bg-transparent-80 flex-row justify-between">
       <View className="flex-row space-x-2">
-        {images?.map(image => (
-          <Image
-            key={image}
-            source={{ uri: image }}
-            className="w-8 h-8 rounded-md"
-          />
-        ))}
+        {images?.map(image => {
+          return image.type === 'image' ? (
+            <Image
+              key={image.id}
+              source={{ uri: image.uri }}
+              className="w-8 h-8 rounded-md"
+            />
+          ) : (
+            <Video
+              key={image.id}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 6,
+              }}
+              muted
+              allowsExternalPlayback={false}
+              resizeMode="cover"
+              source={{
+                uri: image.uri,
+              }}
+            />
+          );
+        })}
       </View>
       <AnimatedPressable onPress={() => navigation.navigate('edit-image')}>
         <Icon name="ArrowActive" />
       </AnimatedPressable>
     </View>
-  ) : null;
+  );
 };
 
-interface UploadToonParam {
-  images: string[];
+type ImageMeta = {
+  id: string;
+  type: 'image';
+  uri: string;
+};
+
+type VideoMeta = {
+  id: string;
+  type: 'video';
+  uri: string;
+  duration: number;
+};
+
+export interface UploadToonParam {
+  images: (ImageMeta | VideoMeta)[];
   type: 'toon' | 'challenge';
 }
 

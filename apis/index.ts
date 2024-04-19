@@ -126,49 +126,47 @@ class PoopApi {
     return data.data;
   }
 
+  async refresh() {
+    const { data } = await PoopApi.handler<Response<LoginSuccess>>({
+      method: 'POST',
+      url: '/v1/auth/refresh',
+    });
+
+    return data;
+  }
+
   private static async handler<T = any>(config: AxiosRequestConfig<unknown>) {
     return PoopApi.instance<T>(config);
   }
 
-  private setAccessToken(accessToken: string) {
+  private async setAccessToken({
+    accessToken,
+    refresh,
+  }: {
+    accessToken: string;
+    refresh?: boolean;
+  }) {
     PoopApi.instance.defaults.headers.common[XCI] = accessToken;
+    if (refresh) {
+      const { data } = await this.refresh();
+      await AsyncStorage.setItem(Token.ACT, data.accessToken);
+      PoopApi.instance.defaults.headers.common[XCI] = data.accessToken;
+    }
   }
 
-  injectInterceptor(accessToken: string) {
-    this.setAccessToken(accessToken);
+  async injectInterceptor(InjectOptions: {
+    accessToken: string;
+    refresh?: boolean;
+  }) {
+    await this.setAccessToken(InjectOptions);
 
     PoopApi.instance.interceptors.response.use(
       response => response,
       async error => {
         if (error.response.status === 401) {
-          try {
-            const refreshToken = await AsyncStorage.getItem(Token.RFT);
-            if (refreshToken) {
-              try {
-                const url = new URL(PoopApi.instance.defaults.baseURL!);
-                // FIXME
-                url.pathname = '/v1/auth/refresh';
-                const res = await fetch(url, {
-                  body: JSON.stringify({ refreshToken }),
-                }).then(response => response.json());
-                const { accessToken: newAccessToken } = res.data;
-                this.setAccessToken(newAccessToken);
-                await AsyncStorage.setItem(Token.ACT, accessToken);
-                PoopApi.instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-                return PoopApi.instance.request(error.config);
-              } catch (refreshError) {
-                await AsyncStorage.removeItem(Token.ACT);
-                await AsyncStorage.removeItem(Token.RFT);
-                return Promise.reject(refreshError);
-              }
-            }
-          } catch (refreshError: any) {
-            if (refreshError?.status! === 401) {
-              await AsyncStorage.removeItem(Token.ACT);
-              await AsyncStorage.removeItem(Token.RFT);
-            }
-            return Promise.reject(refreshError);
-          }
+          await AsyncStorage.removeItem(Token.ACT);
+          await AsyncStorage.removeItem(Token.RFT);
+          return Promise.reject(error);
         }
         return Promise.reject(error);
       },

@@ -120,6 +120,10 @@ dependencies {
         exclude group:'com.squareup.okhttp3', module:'okhttp'
     }
 
+
+    compile project(':react-native-video')
++   implementation "androidx.appcompat:appcompat:1.0.0"
+
     debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

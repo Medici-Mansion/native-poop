@@ -3,7 +3,7 @@ import Icon from '@/components/icons';
 import { AnimatedPressable } from '@/components/ui/animate-pressable';
 import { useNavi } from '@/hooks/useNavi';
 import { useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Dimensions, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Popover from 'react-native-popover-view';
 import { Mode } from 'react-native-popover-view/dist/Types';
@@ -14,16 +14,29 @@ interface UploadModalButtonProps {
   size: number;
 }
 
+const width = Dimensions.get('screen').width / 5;
 export const UploadButton = (_: UploadModalButtonProps) => {
   const { navigation } = useNavi();
   const ref = useRef<TouchableOpacity>(null);
   const [open, setOpen] = useState(false);
   return (
     <>
-      <TouchableOpacity ref={ref} onPress={() => setOpen(true)}>
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          width,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        ref={ref}
+        onPress={() => setOpen(true)}>
         <PlusIcon />
       </TouchableOpacity>
       <Popover
+        animationConfig={{
+          delay: 0,
+          duration: 150,
+        }}
         onRequestClose={() => setOpen(false)}
         mode={Mode.RN_MODAL}
         isVisible={open}

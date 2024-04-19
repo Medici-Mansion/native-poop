@@ -24,9 +24,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '@/apis';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSafeAreaStyle } from '@/hooks/useSafeAreaStyle';
+import { useRefs } from '@/hooks/useRefs';
 
 const LoginScreen = () => {
   const insets = useSafeAreaStyle();
+  const { idRef, passwordRef } = useRefs(['id', 'password']);
   const { mutateAsync, isPending } = useLogin();
   const { hideBottomSheet, ref, showBottomSheet, snapPoints } =
     useBottomSheet('50%');
@@ -42,12 +44,11 @@ const LoginScreen = () => {
     form.recomputeErrors();
 
     await mutateAsync(data, {
-      async onSuccess({ accessToken, refreshToken }) {
+      async onSuccess({ accessToken }) {
         await Promise.allSettled([
           AsyncStorage.setItem(Token.ACT, accessToken),
-          AsyncStorage.setItem(Token.RFT, refreshToken),
         ]);
-        api.injectInterceptor(accessToken);
+        api.injectInterceptor({ accessToken });
 
         const response = await api.getMyProfileList();
 
@@ -67,7 +68,10 @@ const LoginScreen = () => {
          * @TODO
          * @description 프로필 목록이 존재할 경우
          */
-        queryClient.resetQueries({ queryKey: ['check', 'login'] });
+        queryClient.invalidateQueries({
+          queryKey: ['check', 'login'],
+          refetchType: 'all',
+        });
         return;
       },
       onError({ response, isAxiosError }) {
@@ -104,12 +108,20 @@ const LoginScreen = () => {
                     .min(6, { message: '아이디 6자 이상' })}>
                   {({ onBlur, value, setValue, errors }) => (
                     <Input
+                      ref={idRef}
+                      autoComplete="off"
+                      autoFocus
+                      autoCapitalize="none"
+                      returnKeyType="next"
                       onBlur={onBlur}
                       placeholder="아이디, 핸드폰 번호, 이메일"
                       placeholderTextColor={'#5D5D5D'}
                       onChangeText={setValue}
                       value={value}
                       error={errors[0]}
+                      onSubmitEditing={() => {
+                        passwordRef?.current?.focus();
+                      }}
                     />
                   )}
                 </Field>
@@ -122,6 +134,7 @@ const LoginScreen = () => {
                     .min(1, { message: '비밀번호 필수' })}>
                   {({ onBlur, value, setValue, errors }) => (
                     <Input
+                      ref={passwordRef}
                       placeholder="비밀번호"
                       onBlur={onBlur}
                       onChangeText={setValue}
@@ -129,6 +142,8 @@ const LoginScreen = () => {
                       value={value}
                       secureTextEntry
                       error={errors[0]}
+                      onSubmitEditing={submit}
+                      returnKeyType="join"
                     />
                   )}
                 </Field>

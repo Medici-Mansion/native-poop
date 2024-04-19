@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -27,9 +27,9 @@ import { CloseIcon } from '@/assets/icons';
 import { UploadStackScreen } from '@/screens/stack/upload-toon';
 
 const Stack = createNativeStackNavigator();
-init();
 
 export function Router(): JSX.Element {
+  const [isInitialize, setIsInitialize] = useState(false);
   const { login } = useUserStore();
   const queryClient = useQueryClient();
   const { data: profiles } = useQuery({
@@ -38,7 +38,7 @@ export function Router(): JSX.Element {
       const res = await api.getMyProfileList();
       return res.data;
     },
-    enabled: false,
+    enabled: isInitialize,
   });
   const { data: me, isLoading: isMeLoading } = useQuery({
     queryKey: ['check', 'login'],
@@ -55,13 +55,23 @@ export function Router(): JSX.Element {
       }
       return meResponse.data;
     },
+    enabled: isInitialize,
   });
 
+  const initialize = async () => {
+    await init();
+    setIsInitialize(true);
+  };
+
+  useLayoutEffect(() => {
+    initialize();
+  }, []);
+
   useEffect(() => {
-    if (!isMeLoading) {
+    if (!isMeLoading && isInitialize) {
       SplashScreen.hide();
     }
-  }, [isMeLoading]);
+  }, [isMeLoading, isInitialize]);
 
   return (
     <SafeAreaProvider style={{ flex: 1, backgroundColor: 'black' }}>
@@ -69,7 +79,8 @@ export function Router(): JSX.Element {
         <GestureHandlerRootView>
           <Host>
             <NavigationContainer>
-              {isMeLoading ? null : !me || (me && !profiles?.length) ? (
+              {isMeLoading ? null : !me ||
+                (me && !me.latestProfileId && !profiles?.length) ? (
                 <Stack.Navigator
                   initialRouteName={
                     me && !profiles?.length ? 'SuccessSignup' : 'Login'

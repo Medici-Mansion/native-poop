@@ -1,5 +1,6 @@
+import { mergeRefs } from '@/lib/utils';
 import { theme } from '@/theme';
-import { useRef } from 'react';
+import { RefObject, forwardRef, useRef } from 'react';
 import {
   GestureResponderEvent,
   Pressable,
@@ -22,62 +23,61 @@ interface InputProps extends TextInputProps {
   onOuterPressIn?: (event: GestureResponderEvent) => void;
 }
 
-export const Input = ({
-  label,
-  error,
-  hint,
-  disabled,
-  onOuterPressIn,
-  ...props
-}: InputProps) => {
-  const ref = useRef<TextInput>(null);
-  const bgColor = error ? theme.colors.system.red : 'transparent';
-  const animatedStyles = useAnimatedProps(() => {
-    return {
-      borderColor: bgColor,
-    };
-  });
+export const Input = forwardRef<TextInput, InputProps>(
+  ({ label, error, hint, disabled, onOuterPressIn, ...props }, ref) => {
+    const bgColor = error ? theme.colors.system.red : 'transparent';
+    const animatedStyles = useAnimatedProps(() => {
+      return {
+        borderColor: bgColor,
+      };
+    });
 
-  return (
-    <Pressable
-      disabled={disabled}
-      className="space-y-4 relative"
-      onPressIn={event => {
-        onOuterPressIn && onOuterPressIn(event);
-        ref.current?.focus();
-      }}>
-      {label && <Text className="text-body-b12 text-gray-200">{label}</Text>}
-      <Animated.View
-        style={[animatedStyles]}
-        className={'rounded-3xl bg-gray-500 border px-6 py-6'}>
-        <TextInput
-          ref={ref}
-          placeholderTextColor={theme.colors.gray[300]}
-          {...props}
-          className="text-body-m14 text-white"
-        />
-      </Animated.View>
-      {hint ? (
-        <Animated.Text
-          entering={FadeIn.duration(100).springify().mass(0.3)}
-          exiting={FadeOut.duration(100).springify().mass(0.3)}
-          layout={CurvedTransition.duration(100).delay(120)}
-          key={hint}
-          className="text-white">
-          {hint}
-        </Animated.Text>
-      ) : (
-        error && (
+    const innerRef = useRef<TextInput | null>(null);
+
+    return (
+      <Pressable
+        disabled={disabled}
+        className="space-y-4 relative"
+        onPressIn={event => {
+          onOuterPressIn && onOuterPressIn(event);
+          (ref as RefObject<TextInput>)?.current?.focus();
+        }}>
+        {label && <Text className="text-body-b12 text-gray-200">{label}</Text>}
+        <Animated.View
+          style={[animatedStyles]}
+          className={'rounded-3xl bg-gray-500 border px-6 py-6'}>
+          <TextInput
+            ref={mergeRefs(innerRef, ref)}
+            placeholderTextColor={theme.colors.gray[300]}
+            {...props}
+            autoCorrect={false}
+            spellCheck={false}
+            clearButtonMode="while-editing"
+            className="text-body-m14 text-white"
+          />
+        </Animated.View>
+        {hint ? (
           <Animated.Text
             entering={FadeIn.duration(100).springify().mass(0.3)}
             exiting={FadeOut.duration(100).springify().mass(0.3)}
             layout={CurvedTransition.duration(100).delay(120)}
-            key={error}
-            className="text-system-red">
-            {error}
+            key={hint}
+            className="text-white">
+            {hint}
           </Animated.Text>
-        )
-      )}
-    </Pressable>
-  );
-};
+        ) : (
+          error && (
+            <Animated.Text
+              entering={FadeIn.duration(100).springify().mass(0.3)}
+              exiting={FadeOut.duration(100).springify().mass(0.3)}
+              layout={CurvedTransition.duration(100).delay(120)}
+              key={error}
+              className="text-system-red">
+              {error}
+            </Animated.Text>
+          )
+        )}
+      </Pressable>
+    );
+  },
+);
