@@ -10,7 +10,7 @@ const useGetVerifyCode = (
     VerifyParam
   >,
 ) => {
-  const { mutate, data, isSuccess, isPending, error } = useMutation<
+  const { mutateAsync, data, isSuccess, isPending, error } = useMutation<
     SuccessGetVerifyCodeRes,
     AxiosError,
     VerifyParam
@@ -21,7 +21,7 @@ const useGetVerifyCode = (
   });
 
   return {
-    mutate,
+    mutateAsync,
     data,
     isSuccess,
     isPending,

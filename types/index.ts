@@ -39,18 +39,18 @@ export enum Gender {
 }
 
 export enum Verify {
-  EMAIL = 'EMAIL',
-  PHONE = 'PHONE',
+  EMAIL = 'email',
+  PHONE = 'phone',
 }
 
 export interface SignupParam {
   nickname: string;
   id: string;
   password: string;
-  email: string;
   birthday: string;
   gender: string;
-  phone: string;
+  email?: string;
+  phone?: string;
 }
 
 export interface VerifyParam {
