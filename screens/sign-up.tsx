@@ -1,59 +1,86 @@
-import React, { useState, useEffect } from 'react';
-import dayjs from 'dayjs';
 import { z } from 'zod';
-import {
-  Pressable,
-  Text,
-  TextInput,
-  View,
-  KeyboardAvoidingView,
-  Dimensions,
-  Keyboard,
-} from 'react-native';
+import { View, Text, Pressable, Keyboard } from 'react-native';
+import React, {
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Field, Form } from 'houseform';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { BackHandler } from '@/assets/icons';
-import { RadioButton } from 'react-native-paper';
+import { Field, Form } from 'houseform';
 import DatePicker from 'react-native-date-picker';
+import { Portal } from 'react-native-portalize';
+import dayjs from 'dayjs';
+
+import { SignupFormList } from '@/const';
+import { SignupParam, Verify } from '@/types';
 
 import { useNavi } from '@/hooks/useNavi';
-import useGetVerifyCode from '@/hooks/user/use-get-verify-code';
-import { SignupFormList } from '../const';
 import useSignup from '@/hooks/user/use-signup';
-import { Verify, VerifyCheckParam } from '@/types';
+import useGetVerifyCode from '@/hooks/user/use-get-verify-code';
 import useVerify from '@/hooks/user/use-verify';
+import { Input, RadioButton, RadioContextProvider } from '@/components/ui';
+import SignupFunnel from '@/components/signup-funnel';
+import KeyboardTopButton from '@/components/keyboard-top-button';
+import { BackHandler } from '@/assets/icons';
 
-const SignUpScreen = () => {
+const Signup = () => {
+  const validateHandlerRef = useRef<{ handlePress: () => void }>(null);
   const { navigation } = useNavi();
-
-  const [step, setStep] = useState(0);
-  const [radioValue, setRadioValue] = useState('');
   const [selectPhoneOrRadio, setSelectPhoneOrRadio] = useState<Verify>(
     Verify.PHONE,
   );
-  const [birthFlag, setBirthFlag] = useState(false);
-  const [picker, setPicker] = useState(false);
-  const [date, setDate] = useState(new Date());
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [formValue, setFormValue] = useState({
-    nickname: '',
-    id: '',
-    password: '',
-    email: '',
-    birthday: '',
-    gender: '',
-    phone: '',
-    code: '',
-  });
+  const [step, setStep] = useState(0);
 
-  const { mutate: getVerifyCodeMutate } = useGetVerifyCode({
+  const [picker, setPicker] = useState(false);
+  const genders = useMemo(
+    () => [
+      { label: '암컷', value: 'FEMALE' },
+      { label: '수컷', value: 'MALE' },
+      { label: '선택안함', value: 'NONE' },
+    ],
+    [],
+  );
+
+  const verify = useMemo(
+    () => [
+      { label: '휴대폰', value: 'phone' },
+      { label: '이메일', value: 'email' },
+    ],
+    [],
+  );
+
+  const { mutateAsync: getVerifyCodeMutate } = useGetVerifyCode({
     onSuccess(data) {
-      console.log(data, '<<< code');
+      console.log(data, '<<< getVerifyCode Success');
+    },
+    onError(err) {
+      console.log(err.message, '<<<< getverify');
+    },
+  });
+  const { mutateAsync: signupMutate } = useSignup({
+    onSuccess(data, variables) {
+      if (variables.email || variables.phone) {
+        console.log(variables, 'variables');
+        console.log(selectPhoneOrRadio, '<<<< radio');
+        getVerifyCodeMutate({
+          type: selectPhoneOrRadio,
+          vid: (selectPhoneOrRadio === Verify.EMAIL
+            ? variables.email
+            : variables.phone) as string,
+        });
+        data.data ? setStep(prev => prev + 1) : console.log(data);
+      }
+    },
+    onError(err) {
+      console.log(err);
+      setStep(prev => prev + 1);
     },
   });
 
-  const { mutate: verifyMutate } = useVerify({
+  const { mutate: verifyCheckMutate } = useVerify({
     onSuccess(response) {
       const { data } = response || {};
       if (data) navigation.push('SuccessSignup');
@@ -63,24 +90,7 @@ const SignUpScreen = () => {
     },
   });
 
-  const { mutate: signupMutate } = useSignup({
-    onSuccess(data, variables) {
-      variables.email;
-      getVerifyCodeMutate({
-        type: selectPhoneOrRadio,
-        vid:
-          selectPhoneOrRadio === Verify.EMAIL
-            ? variables.email
-            : variables.phone,
-      });
-      data.data ? setStep(prev => prev + 1) : console.log(data);
-    },
-  });
-
-  const onPressEditing = async (value: { [key: string]: string }) => {
-    setFormValue(prev => ({ ...prev, ...value }));
-    step <= 5 && setStep(prev => prev + 1);
-  };
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -96,417 +106,307 @@ const SignUpScreen = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (formValue.code) {
-      const verifyParam: VerifyCheckParam = {
-        type: selectPhoneOrRadio,
-        vid: selectPhoneOrRadio === 'PHONE' ? formValue.phone : formValue.email,
-        code: formValue.code,
-      };
-      verifyMutate(verifyParam);
-    }
-  }, [formValue.code]);
-
   return (
-    <GestureHandlerRootView
-      style={{
-        flex: 1,
-        backgroundColor: 'black',
-      }}>
-      <KeyboardAwareScrollView>
-        <View className="py-8 space-y-4 px-8">
-          <Pressable onPress={() => navigation.goBack()}>
-            <BackHandler />
-          </Pressable>
-          <Text className="text-white font-bold text-2xl">
-            {SignupFormList[step]?.title || ''}
-          </Text>
-          {step === 6 && (
-            <Form
-              onSubmit={code => {
-                setFormValue(prev => ({ ...prev, ...code }));
-              }}>
-              {({ isValid, submit }) => (
-                <View>
-                  <Field name={SignupFormList[6].name}>
-                    {({ value, setValue, onBlur, errors }) => {
-                      return (
-                        <View className="py-6">
-                          <TextInput
-                            value={value}
-                            onBlur={() => {
-                              onBlur();
-                              isValid && submit();
-                            }}
-                            onChangeText={text => setValue(text)}
-                            placeholder={SignupFormList[6].placeholder}
-                            placeholderTextColor={'#5D5D5D'}
-                            keyboardType="number-pad"
-                            className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
-                          />
-                          {errors.map(error => (
-                            <Text key={error} className="text-white mt-3 ml-3">
-                              {error}
-                            </Text>
-                          ))}
-                        </View>
-                      );
-                    }}
-                  </Field>
-                </View>
-              )}
-            </Form>
-          )}
-          {step >= 5 && (
-            <Form
-              onSubmit={vid => {
-                signupMutate({
-                  ...formValue,
-                  ...vid,
-                });
-                setFormValue(prev => ({ ...prev, ...vid }));
-              }}>
-              {({ submit, isValid }) => (
-                <View>
-                  {step > 5 && (
-                    <Text className="text-[#5D5D5D]">
-                      {SignupFormList[5].placeholder}
-                    </Text>
-                  )}
-                  <RadioButton.Group
-                    onValueChange={(value: string) => {
-                      const enumValue = value as Verify;
-                      setSelectPhoneOrRadio(enumValue);
-                    }}
-                    value={selectPhoneOrRadio}>
-                    <View className="flex flex-row gap-14 py-5">
-                      <View className="flex items-center">
-                        <Text className="text-white">휴대폰</Text>
-                        <RadioButton value="PHONE" color="white" />
-                      </View>
-                      <View className="flex items-center">
-                        <Text className="text-white">이메일</Text>
-                        <RadioButton value="EMAIL" color="white" />
-                      </View>
-                    </View>
-                  </RadioButton.Group>
-                  <Field
-                    name={selectPhoneOrRadio === 'PHONE' ? 'phone' : 'email'}>
-                    {({ value, setValue, onBlur, errors }) => {
-                      return (
-                        <View className="py-4">
-                          {selectPhoneOrRadio === 'PHONE' ? (
-                            <TextInput
-                              key={'PHONE'}
-                              value={value}
-                              onBlur={() => {
-                                onBlur();
-                                isValid && submit();
-                              }}
-                              onChangeText={text => setValue(text)}
-                              keyboardType={'phone-pad'}
-                              className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
-                              placeholder={'휴대폰 번호'}
-                              placeholderTextColor={'#5D5D5D'}
-                            />
-                          ) : (
-                            <TextInput
-                              key={'EMAIL'}
-                              value={value}
-                              onBlur={() => {
-                                onBlur();
-                                isValid && submit();
-                              }}
-                              onChangeText={text => setValue(text)}
-                              // onChangeText={text => console.log(text)}
-                              keyboardType={'email-address'}
-                              className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
-                              placeholder={'이메일'}
-                              placeholderTextColor={'#5D5D5D'}
-                            />
-                          )}
-
-                          {errors.map(error => (
-                            <Text key={error} className="text-white mt-3 ml-3">
-                              {error}
-                            </Text>
-                          ))}
-                        </View>
-                      );
-                    }}
-                  </Field>
-                </View>
-              )}
-            </Form>
-          )}
-          {step >= 4 && (
-            <View>
-              {step > 4 && (
-                <Text className="text-[#5D5D5D]">
-                  {SignupFormList[4].placeholder}
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: 'black' }}>
+      <Form
+        onSubmit={value => {
+          console.log(value);
+        }}>
+        {({ value: formValues }) => (
+          <>
+            <KeyboardAwareScrollView>
+              <View className="py-8 space-y-4 px-8">
+                <Pressable onPress={() => navigation.goBack()}>
+                  <BackHandler />
+                </Pressable>
+                <Text className="text-white font-bold text-2xl pb-5">
+                  {SignupFormList[step]?.title || ''}
                 </Text>
-              )}
-              <RadioButton.Group
-                onValueChange={value => {
-                  setRadioValue(value);
-                  setFormValue(prev => ({ ...prev, gender: value }));
-                  setStep(prev => prev + 1);
-                }}
-                value={radioValue}>
-                <View className="flex flex-row gap-14 py-6 ">
-                  <View className="flex items-center">
-                    <Text className="text-white">여성</Text>
-                    <RadioButton value="FEMALE" color="white" />
-                  </View>
-                  <View className="flex items-center">
-                    <Text className="text-white">남성</Text>
-                    <RadioButton value="MALE" color="white" />
-                  </View>
-                  <View className="flex items-center">
-                    <Text className="text-white">선택안함</Text>
-                    <RadioButton value="NONE" color="white" />
-                  </View>
-                </View>
-              </RadioButton.Group>
-            </View>
-          )}
-          {step >= 3 && (
-            <Form>
-              {({ isValid, submit }) => (
-                <View>
-                  {step > 3 && (
-                    <Text className="text-[#5D5D5D]">
-                      {SignupFormList[3].placeholder}
-                    </Text>
-                  )}
-                  <Field
-                    name={SignupFormList[3].name}
-                    onBlurValidate={z.string()}>
-                    {({ setValue, onBlur, errors }) => {
-                      return (
-                        <Pressable
-                          className="py-6"
-                          onPress={() => setPicker(true)}>
-                          <TextInput
-                            onPressIn={() => setPicker(true)}
-                            value={
-                              birthFlag
-                                ? dayjs(date).format('YYYY-MM-DD')
-                                : SignupFormList[3].placeholder
-                            }
-                            onBlur={() => {
-                              onBlur();
-                              isValid && submit();
-                            }}
-                            editable={false}
-                            onChangeText={text => setValue(text)}
-                            placeholder={SignupFormList[3].placeholder}
-                            placeholderTextColor={'#5D5D5D'}
-                            className={`rounded-xl bg-[#191919] border border-white px-6 py-3 ${
-                              birthFlag ? 'text-white' : 'text-[#5D5D5D]'
-                            }`}
-                          />
-                          {errors.map(error => (
-                            <Text key={error} className="text-white mt-3 ml-3">
-                              {error}
-                            </Text>
-                          ))}
-                        </Pressable>
-                      );
-                    }}
-                  </Field>
-                </View>
-              )}
-            </Form>
-          )}
-          {step >= 2 && (
-            <Form onSubmit={onPressEditing}>
-              {({ isValid, submit }) => (
-                <View>
-                  {step > 2 && (
-                    <Text className="text-[#5D5D5D]">
-                      {SignupFormList[2].placeholder}
-                    </Text>
-                  )}
-                  <Field
-                    name={SignupFormList[2].name}
-                    onBlurValidate={z
-                      .string({
-                        required_error: '아이디를 입력해주세요!',
-                      })
-                      .min(6, {
-                        message: '6글자 이상을 입력해주세요',
-                      })}>
-                    {({ value, setValue, onBlur, errors }) => {
-                      return (
-                        <View className="py-6">
-                          <TextInput
-                            value={value}
-                            onBlur={() => {
-                              onBlur();
-                              isValid && submit();
-                            }}
-                            secureTextEntry
-                            onChangeText={text => setValue(text)}
-                            placeholder={SignupFormList[2].placeholder}
-                            placeholderTextColor={'#5D5D5D'}
-                            className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
-                          />
-                          {errors.map(error => (
-                            <Text key={error} className="text-white mt-3 ml-3">
-                              {error}
-                            </Text>
-                          ))}
-                        </View>
-                      );
-                    }}
-                  </Field>
-                </View>
-              )}
-            </Form>
-          )}
-          {step >= 1 && (
-            <Form onSubmit={onPressEditing}>
-              {({ isValid, submit }) => (
-                <View>
-                  {step > 1 && (
-                    <Text className="text-[#5D5D5D]">
-                      {SignupFormList[1].placeholder}
-                    </Text>
-                  )}
-                  <Field
-                    name={SignupFormList[1].name}
-                    onBlurValidate={z.string({
-                      required_error: '아이디를 입력해주세요!',
-                    })}>
-                    {({ value, setValue, onBlur, errors }) => {
-                      return (
-                        <View className="py-6">
-                          <TextInput
-                            value={value}
-                            onChangeText={text => setValue(text)}
-                            placeholder={SignupFormList[1].placeholder}
-                            placeholderTextColor={'#5D5D5D'}
-                            className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
-                            onBlur={() => {
-                              onBlur();
-                              isValid && submit();
-                            }}
-                          />
-                          {errors.map(error => (
-                            <Text key={error} className="text-white mt-3 ml-3">
-                              {error}
-                            </Text>
-                          ))}
-                        </View>
-                      );
-                    }}
-                  </Field>
-                </View>
-              )}
-            </Form>
-          )}
-          {step >= 0 && (
-            <Form onSubmit={onPressEditing}>
-              {({ isValid, submit }) => (
-                <View>
-                  {step > 0 && (
-                    <Text className="text-[#5D5D5D]">
-                      {SignupFormList[0].placeholder}
-                    </Text>
-                  )}
-                  <Field
-                    name={SignupFormList[0].name}
-                    onBlurValidate={z
-                      .string({
-                        required_error: '이름을 입력해주세요!',
-                      })
-                      .min(5, {
-                        message: '5글자 이상을 입력해주세요',
-                      })}>
-                    {({ value, setValue, onBlur, errors }) => {
-                      return (
-                        <View className="py-4">
-                          <TextInput
-                            value={value}
-                            onBlur={() => {
-                              onBlur();
-                              isValid && submit();
-                            }}
-                            onChangeText={text => setValue(text)}
-                            placeholder={SignupFormList[0].placeholder}
-                            placeholderTextColor={'#5D5D5D'}
-                            className="rounded-xl bg-[#191919] text-white border border-white px-6 py-3"
-                          />
-                          {errors.map(error => (
-                            <Text
-                              key={error}
-                              className="text-red-500 mt-3 ml-3">
-                              {error}
-                            </Text>
+                <View className="space-y-5">
+                  <SignupFunnel step={step}>
+                    <View>
+                      <Field
+                        name={'nickname'}
+                        onBlurValidate={z
+                          .string({
+                            required_error: '이름을 입력해주세요!',
+                          })
+                          .min(5, {
+                            message: '이름을 5글자 이상 입력해주세요!',
+                          })}>
+                        {({ value, setValue, errors }) => {
+                          return (
+                            <Input
+                              value={value}
+                              placeholderTextColor={'#5D5D5D'}
+                              onChangeText={setValue}
+                              error={errors[0]}
+                              placeholder="이름"
+                              label={'이름'}
+                              onSubmitEditing={() => {
+                                validateHandlerRef.current?.handlePress();
+                              }}
+                              keyboardType={'name-phone-pad'}
+                            />
+                          );
+                        }}
+                      </Field>
+                    </View>
+                    <View>
+                      <Field
+                        name={'id'}
+                        onBlurValidate={z
+                          .string({
+                            required_error: '아이디를 입력해주세요!',
+                          })
+                          .min(5, {
+                            message: '아이디를 입력해주세요',
+                          })}>
+                        {({ value, setValue, errors }) => {
+                          return (
+                            <Input
+                              value={value}
+                              placeholderTextColor={'#5D5D5D'}
+                              onChangeText={setValue}
+                              error={errors[0]}
+                              placeholder="아이디"
+                              label={'아이디'}
+                              onSubmitEditing={() => {
+                                validateHandlerRef.current?.handlePress();
+                              }}
+                              keyboardType={'name-phone-pad'}
+                            />
+                          );
+                        }}
+                      </Field>
+                    </View>
+                    <View>
+                      <Field
+                        name={'password'}
+                        onBlurValidate={z
+                          .string({
+                            required_error: '비밀번호를 입력해주세요!',
+                          })
+                          .min(5, {
+                            message: '비밀번호를 입력해주세요',
+                          })}>
+                        {({ value, setValue, errors }) => {
+                          return (
+                            <Input
+                              value={value}
+                              placeholderTextColor={'#5D5D5D'}
+                              onChangeText={setValue}
+                              error={errors[0]}
+                              placeholder="비밀번호"
+                              label={'비밀번호'}
+                              onSubmitEditing={() => {
+                                validateHandlerRef.current?.handlePress();
+                              }}
+                              keyboardType={'name-phone-pad'}
+                            />
+                          );
+                        }}
+                      </Field>
+                    </View>
+                    <View>
+                      <Field
+                        name={'birthday'}
+                        onChangeValidate={z.string().min(1)}
+                        onMountHint={z.string().min(1)}>
+                        {({ value, setValue, onBlur, errors }) => (
+                          <>
+                            <Input
+                              onOuterPressIn={() => setPicker(true)}
+                              label={'생년월일'}
+                              onPressIn={() => setPicker(true)}
+                              value={value ?? ''}
+                              onBlur={onBlur}
+                              editable={false}
+                              placeholder={'생년월일을 선택해주세요.'}
+                              placeholderTextColor={'#5D5D5D'}
+                              error={errors[0]}
+                            />
+                            <Portal>
+                              {picker && (
+                                <View className="absolute bottom-0 w-screen">
+                                  <Pressable
+                                    onPress={() => {
+                                      setPicker(false);
+                                      setStep(prev => prev + 1);
+                                    }}>
+                                    <Text className="bg-white text-black text-center py-3">
+                                      확인
+                                    </Text>
+                                  </Pressable>
+                                  <DatePicker
+                                    className="bg-gray-200 w-full"
+                                    date={value ? new Date(value) : new Date()}
+                                    locale="ko"
+                                    mode="date"
+                                    androidVariant="iosClone"
+                                    onDateChange={newDate =>
+                                      setValue(
+                                        dayjs(newDate).format('YYYY-MM-DD'),
+                                      )
+                                    }
+                                    onConfirm={newDate => {
+                                      setPicker(false);
+                                      setValue(
+                                        dayjs(newDate).format('YYYY-MM-DD'),
+                                      );
+                                    }}
+                                    onCancel={() => {
+                                      setPicker(false);
+                                    }}
+                                  />
+                                </View>
+                              )}
+                            </Portal>
+                          </>
+                        )}
+                      </Field>
+                    </View>
+                    <View>
+                      <Field name="gender">
+                        {({ value, setValue }) => (
+                          <RadioContextProvider
+                            onChangeValue={setValue}
+                            defaultValue={value}
+                            setStep={setStep}
+                            step={step}>
+                            <View className="flex flex-row">
+                              {genders.map(gender => (
+                                <RadioButton
+                                  key={gender.value}
+                                  label={gender.label}
+                                  value={gender.value}
+                                />
+                              ))}
+                            </View>
+                          </RadioContextProvider>
+                        )}
+                      </Field>
+                    </View>
+                    <View>
+                      <RadioContextProvider
+                        onChangeValue={(value: unknown) =>
+                          setSelectPhoneOrRadio(value as SetStateAction<Verify>)
+                        }
+                        defaultValue={selectPhoneOrRadio}>
+                        <View className="flex flex-row">
+                          {verify.map(select => (
+                            <RadioButton
+                              key={select.value}
+                              label={select.label}
+                              value={select.value}
+                            />
                           ))}
                         </View>
-                      );
-                    }}
-                  </Field>
+                        {selectPhoneOrRadio === 'phone' ? (
+                          <Field
+                            name={'phone'}
+                            onBlurValidate={z
+                              .string({
+                                required_error: '이름을 입력해주세요!',
+                              })
+                              .min(5, {
+                                message: '이름을 5글자 이상 입력해주세요!',
+                              })}>
+                            {({ value, setValue, errors }) => {
+                              return (
+                                <Input
+                                  value={value}
+                                  placeholderTextColor={'#5D5D5D'}
+                                  onChangeText={setValue}
+                                  error={errors[0]}
+                                  placeholder="핸드폰 번호"
+                                  onSubmitEditing={() =>
+                                    signupMutate(formValues as SignupParam)
+                                  }
+                                  keyboardType={'phone-pad'}
+                                />
+                              );
+                            }}
+                          </Field>
+                        ) : (
+                          <Field
+                            name={'email'}
+                            onBlurValidate={z
+                              .string({
+                                required_error: '이름을 입력해주세요!',
+                              })
+                              .min(5, {
+                                message: '이름을 5글자 이상 입력해주세요!',
+                              })}>
+                            {({ value, setValue, errors }) => {
+                              return (
+                                <Input
+                                  value={value}
+                                  placeholderTextColor={'#5D5D5D'}
+                                  onChangeText={setValue}
+                                  error={errors[0]}
+                                  placeholder="이메일"
+                                  onSubmitEditing={() =>
+                                    signupMutate(formValues as SignupParam)
+                                  }
+                                  keyboardType={'email-address'}
+                                />
+                              );
+                            }}
+                          </Field>
+                        )}
+                      </RadioContextProvider>
+                    </View>
+                    <View>
+                      <Field
+                        name={'code'}
+                        onBlurValidate={z
+                          .string({
+                            required_error: '비밀번호를 입력해주세요!',
+                          })
+                          .min(5, {
+                            message: '비밀번호를 입력해주세요',
+                          })}>
+                        {({ value, setValue, errors }) => {
+                          return (
+                            <Input
+                              value={value}
+                              placeholderTextColor={'#5D5D5D'}
+                              onChangeText={setValue}
+                              error={errors[0]}
+                              placeholder="인증번호"
+                              label={'인증번호'}
+                              onSubmitEditing={() => {
+                                verifyCheckMutate({
+                                  code: value,
+                                  type: selectPhoneOrRadio,
+                                  vid:
+                                    selectPhoneOrRadio === 'phone'
+                                      ? formValues.phone
+                                      : formValues.email,
+                                });
+                              }}
+                              keyboardType={'name-phone-pad'}
+                            />
+                          );
+                        }}
+                      </Field>
+                    </View>
+                  </SignupFunnel>
                 </View>
-              )}
-            </Form>
-          )}
-        </View>
-      </KeyboardAwareScrollView>
-      {keyboardVisible && (
-        <KeyboardAvoidingView
-          behavior="height"
-          style={{
-            width: Dimensions.get('window').width,
-          }}>
-          <Pressable
-            className="bg-white py-3"
-            onPress={() => {
-              if (step === 6) {
-                console.log('123');
-              }
-            }}>
-            <Text className="text-center font-bold text-black">
-              {step === 5 ? '인증번호 요청' : '확인'}
-            </Text>
-          </Pressable>
-        </KeyboardAvoidingView>
-      )}
-      {picker && (
-        <>
-          <Pressable
-            onPress={() => {
-              setPicker(false);
-              setBirthFlag(true);
-              setStep(prev => prev + 1);
-              setFormValue(prev => ({
-                ...prev,
-                birthday: dayjs(date).format('YYYY-MM-DD'),
-              }));
-            }}>
-            <Text className="bg-white text-black text-center py-3">확인</Text>
-          </Pressable>
-          <DatePicker
-            className="bg-gray-200 w-full"
-            date={date}
-            locale="ko"
-            mode="date"
-            androidVariant="iosClone"
-            onDateChange={setDate}
-            onConfirm={date => {
-              setPicker(false);
-              setDate(date);
-            }}
-            onCancel={() => {
-              setPicker(false);
-            }}
-          />
-        </>
-      )}
+              </View>
+            </KeyboardAwareScrollView>
+            <KeyboardTopButton
+              ref={validateHandlerRef}
+              step={step}
+              setStep={idx => setStep(idx)}
+              show={keyboardVisible}
+            />
+          </>
+        )}
+      </Form>
     </GestureHandlerRootView>
   );
 };
 
-export default SignUpScreen;
+export default Signup;

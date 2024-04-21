@@ -11,7 +11,7 @@ const useSignup = (
     SignupParam
   >,
 ) => {
-  const { mutate, data, isSuccess, isPending, error } = useMutation<
+  const { mutateAsync, data, isSuccess, isPending, error } = useMutation<
     ApiResponse<SuccessSignupRes>,
     AxiosError<{ error: { message: string[] } }>,
     SignupParam
@@ -22,7 +22,7 @@ const useSignup = (
   });
 
   return {
-    mutate,
+    mutateAsync,
     data,
     isSuccess,
     isPending,
