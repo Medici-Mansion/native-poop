@@ -12,19 +12,14 @@ import { RootStackParam } from '@/hooks/useNavi';
 import { AnimatedPressable } from '@/components/ui/animate-pressable';
 import Icon from '@/components/icons';
 import { Form, useFormContext } from 'houseform';
-import {
-  Image,
-  LayoutAnimation,
-  Platform,
-  UIManager,
-  View,
-} from 'react-native';
+import { LayoutAnimation, Platform, UIManager, View } from 'react-native';
 import Video from 'react-native-video';
 import {
   BottomTabNavigationEventMap,
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
 import { useLayoutEffect } from 'react';
+import FastImage from 'react-native-fast-image';
 
 const UploadStack = createNativeStackNavigator();
 
@@ -106,9 +101,10 @@ const UploadTabBar = ({ navigation }: UploadTabBarProps) => {
       <View className="flex-row space-x-2">
         {images?.map(image => {
           return image.type === 'image' ? (
-            <Image
+            <FastImage
               key={image.id}
-              source={{ uri: image.uri }}
+              source={{ uri: image.uri, priority: FastImage.priority.normal }}
+              resizeMode={FastImage.resizeMode.cover}
               className="w-8 h-8 rounded-md"
             />
           ) : (

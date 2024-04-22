@@ -89,6 +89,10 @@ export async function init() {
   const accessToken = await AsyncStorage.getItem(Token.ACT);
 
   if (accessToken) {
-    await api.injectInterceptor({ accessToken, refresh: true });
+    try {
+      await api.injectInterceptor({ accessToken, refresh: true });
+    } catch (error) {
+      await AsyncStorage.clear();
+    }
   }
 }

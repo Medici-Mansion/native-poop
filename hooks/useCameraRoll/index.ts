@@ -33,6 +33,7 @@ export const useGallery = ({ pageSize = 30 }: GalleryOptions): GalleryLogic => {
     Platform.OS === 'ios' && parseInt(Platform.Version, 10) >= 14;
 
   const loadNextPagePictures = useCallback(async () => {
+    if (isLoading || isLoadingNextPage) return;
     try {
       nextCursor ? setIsLoadingNextPage(true) : setIsLoading(true);
       const { edges, page_info } = await CameraRoll.getPhotos({
@@ -59,7 +60,7 @@ export const useGallery = ({ pageSize = 30 }: GalleryOptions): GalleryLogic => {
       setIsLoading(false);
       setIsLoadingNextPage(false);
     }
-  }, [nextCursor, pageSize]);
+  }, [isLoading, isLoadingNextPage, nextCursor, pageSize]);
 
   const getUnloadedPictures = useCallback(async () => {
     try {
@@ -92,7 +93,7 @@ export const useGallery = ({ pageSize = 30 }: GalleryOptions): GalleryLogic => {
     if (!photos) {
       loadNextPagePictures();
     }
-  }, [loadNextPagePictures, photos]);
+  }, [loadNextPagePictures]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener(
