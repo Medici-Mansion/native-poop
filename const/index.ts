@@ -1,4 +1,5 @@
 import { Consonants, SignupForm } from '@/types';
+import { KeyboardTypeOptions } from 'react-native';
 
 export const Token = {
   ACT: 'accessToken',
@@ -22,7 +23,10 @@ export const TERMS = [
   },
 ];
 
-export const SignupFormList: SignupForm[] = [
+export const SignupFormList: (SignupForm & {
+  keyboard?: KeyboardTypeOptions;
+  secure?: boolean;
+})[] = [
   {
     id: 1,
     placeholder: '이름',
@@ -40,6 +44,7 @@ export const SignupFormList: SignupForm[] = [
     placeholder: '비밀번호',
     name: 'password',
     title: '비밀번호를 입력해주세요',
+    secure: true,
   },
   {
     id: 4,

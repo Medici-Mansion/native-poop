@@ -1,4 +1,5 @@
 import { mergeRefs } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { theme } from '@/theme';
 import { RefObject, forwardRef, useRef } from 'react';
 import {
@@ -7,6 +8,7 @@ import {
   Text,
   TextInput,
   TextInputProps,
+  Platform,
 } from 'react-native';
 import Animated, {
   CurvedTransition,
@@ -37,7 +39,7 @@ export const Input = forwardRef<TextInput, InputProps>(
     return (
       <Pressable
         disabled={disabled}
-        className="space-y-4 relative"
+        className="space-y-3 relative"
         onPressIn={event => {
           onOuterPressIn && onOuterPressIn(event);
           (ref as RefObject<TextInput>)?.current?.focus();
@@ -45,7 +47,10 @@ export const Input = forwardRef<TextInput, InputProps>(
         {label && <Text className="text-body-b12 text-gray-200">{label}</Text>}
         <Animated.View
           style={[animatedStyles]}
-          className={'rounded-3xl bg-gray-500 border px-6 py-6'}>
+          className={cn(
+            'rounded-xl bg-gray-500 border px-6',
+            Platform.OS === 'ios' && 'py-4',
+          )}>
           <TextInput
             ref={mergeRefs(innerRef, ref)}
             placeholderTextColor={theme.colors.gray[300]}

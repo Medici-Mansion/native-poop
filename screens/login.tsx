@@ -25,6 +25,7 @@ import { api } from '@/apis';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSafeAreaStyle } from '@/hooks/useSafeAreaStyle';
 import { useRefs } from '@/hooks/useRefs';
+import { AnimatedPressable } from '@/components/ui/animate-pressable';
 
 const LoginScreen = () => {
   const insets = useSafeAreaStyle();
@@ -35,7 +36,6 @@ const LoginScreen = () => {
   const queryClient = useQueryClient();
 
   const { navigation } = useNavi();
-
   const onSubmit = async (
     data: { id: string; password: string },
     form: FormInstance<{ id: string; password: string }>,
@@ -157,14 +157,14 @@ const LoginScreen = () => {
           비밀번호를 잊으셨나요?
         </Text>
       </View>
-      <Pressable
+      <AnimatedPressable
         disabled={isPending}
         onPress={showBottomSheet}
         className="px-4">
         <View className="flex flex-row justify-center border border-[#5D5D5D] rounded-2xl mb-5">
           <Text className="text-white font-bold py-4">회원가입</Text>
         </View>
-      </Pressable>
+      </AnimatedPressable>
 
       <BottomSheet
         ref={ref}
