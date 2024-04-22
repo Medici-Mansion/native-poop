@@ -10,7 +10,9 @@
     "test": "jest",
     "devtools": "npx react-devtools",
     "storybook": "cross-env STORYBOOK_ENABLED=true react-native start --reset-cache",
-    "storybook-generate": "sb-rn-get-stories"
+    "storybook-generate": "sb-rn-get-stories",
+    "push:ios": "appcenter codepush release-react -a medici-mansion/poop-ios -d Staging",
+    "push:android": "appcenter codepush release-react -a medici-mansion/poop-android -d Staging"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^4",
@@ -26,8 +28,6 @@
     "@tanstack/react-query": "^5.18.1",
     "@types/react-native-vector-icons": "^6.4.18",
     "appcenter": "^5.0.1",
-    "appcenter-analytics": "^5.0.1",
-    "appcenter-crashes": "^5.0.1",
     "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",
     "dayjs": "^1.11.10",

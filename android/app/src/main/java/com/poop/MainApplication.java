@@ -10,6 +10,8 @@ import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.microsoft.codepush.react.CodePush;
+import com.brentvatne.react.ReactVideoPackage;
+
 
 // import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import java.util.List;
@@ -34,6 +36,7 @@ public class MainApplication extends Application implements ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           // packages.add(new SplashScreenReactPackage());
+          packages.add(new ReactVideoPackage());
           return packages;
         }
 
