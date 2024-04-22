@@ -9,6 +9,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
+import com.microsoft.codepush.react.CodePush;
 
 // import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import java.util.List;
@@ -20,6 +21,10 @@ public class MainApplication extends Application implements ReactApplication {
         @Override
         public boolean getUseDeveloperSupport() {
           return BuildConfig.DEBUG;
+        }
+
+         protected String getJSBundleFile() {
+            return CodePush.getJSBundleFile();
         }
 
         @Override

@@ -1,4 +1,4 @@
-import { Router } from '@/router';
+import Router from '@/router';
 import { STORYBOOK_ENABLED } from '@env';
 import ReactQueryProvider from '@/provider/react-query.provider';
 

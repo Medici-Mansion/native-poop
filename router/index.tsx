@@ -25,10 +25,10 @@ import TabNavigator from './tab-navigator';
 import { Pressable } from 'react-native';
 import { CloseIcon } from '@/assets/icons';
 import { UploadStackScreen } from '@/screens/stack/upload-toon';
-
+import CodePush, { CodePushOptions } from 'react-native-code-push';
 const Stack = createNativeStackNavigator();
 
-export function Router(): JSX.Element {
+function Router(): JSX.Element {
   const [isInitialize, setIsInitialize] = useState(false);
   const { login } = useUserStore();
   const queryClient = useQueryClient();
@@ -133,3 +133,13 @@ export function Router(): JSX.Element {
     </SafeAreaProvider>
   );
 }
+
+const codePushOptions: CodePushOptions = {
+  checkFrequency: CodePush.CheckFrequency.ON_APP_START,
+  rollbackRetryOptions: {
+    delayInHours: 24,
+    maxRetryAttempts: 1,
+  },
+};
+
+export default CodePush(codePushOptions)(Router);
