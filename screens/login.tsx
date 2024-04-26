@@ -110,7 +110,6 @@ const LoginScreen = () => {
                     <Input
                       ref={idRef}
                       autoComplete="off"
-                      autoFocus
                       autoCapitalize="none"
                       returnKeyType="next"
                       onBlur={onBlur}
