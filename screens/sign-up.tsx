@@ -75,8 +75,7 @@ const Signup = () => {
       }
     },
     onError(err) {
-      console.log(err);
-      setStep(prev => prev + 1);
+      console.log(err, '<<<<<<<useSIgnupError');
     },
   });
 
@@ -86,7 +85,7 @@ const Signup = () => {
       if (data) navigation.push('SuccessSignup');
     },
     onError: err => {
-      console.log(err, '<<<<<< verify error');
+      console.log(err.message, '<<<<<< verify error');
     },
   });
 
@@ -127,14 +126,14 @@ const Signup = () => {
                     <View>
                       <Field
                         name={'nickname'}
-                        onBlurValidate={z
+                        onChangeValidate={z
                           .string({
                             required_error: '이름을 입력해주세요!',
                           })
                           .min(5, {
                             message: '이름을 5글자 이상 입력해주세요!',
                           })}>
-                        {({ value, setValue, errors }) => {
+                        {({ value, setValue, errors, onBlur, validate }) => {
                           return (
                             <Input
                               value={value}
@@ -143,7 +142,9 @@ const Signup = () => {
                               error={errors[0]}
                               placeholder="이름"
                               label={'이름'}
-                              onSubmitEditing={() => {
+                              onSubmitEditing={onBlur}
+                              onBlur={() => {
+                                validate('onChangeValidate');
                                 validateHandlerRef.current?.handlePress();
                               }}
                               keyboardType={'name-phone-pad'}
@@ -155,14 +156,14 @@ const Signup = () => {
                     <View>
                       <Field
                         name={'id'}
-                        onBlurValidate={z
+                        onChangeValidate={z
                           .string({
                             required_error: '아이디를 입력해주세요!',
                           })
-                          .min(5, {
-                            message: '아이디를 입력해주세요',
+                          .min(6, {
+                            message: '아이디 6글자 이상 입력해주세요!',
                           })}>
-                        {({ value, setValue, errors }) => {
+                        {({ value, setValue, errors, onBlur, validate }) => {
                           return (
                             <Input
                               value={value}
@@ -171,7 +172,9 @@ const Signup = () => {
                               error={errors[0]}
                               placeholder="아이디"
                               label={'아이디'}
-                              onSubmitEditing={() => {
+                              onSubmitEditing={onBlur}
+                              onBlur={() => {
+                                validate('onChangeValidate');
                                 validateHandlerRef.current?.handlePress();
                               }}
                               keyboardType={'name-phone-pad'}
@@ -183,14 +186,14 @@ const Signup = () => {
                     <View>
                       <Field
                         name={'password'}
-                        onBlurValidate={z
+                        onChangeValidate={z
                           .string({
                             required_error: '비밀번호를 입력해주세요!',
                           })
                           .min(5, {
                             message: '비밀번호를 입력해주세요',
                           })}>
-                        {({ value, setValue, errors }) => {
+                        {({ value, setValue, errors, onBlur, validate }) => {
                           return (
                             <Input
                               value={value}
@@ -199,7 +202,10 @@ const Signup = () => {
                               error={errors[0]}
                               placeholder="비밀번호"
                               label={'비밀번호'}
-                              onSubmitEditing={() => {
+                              secureTextEntry
+                              onSubmitEditing={onBlur}
+                              onBlur={() => {
+                                validate('onChangeValidate');
                                 validateHandlerRef.current?.handlePress();
                               }}
                               keyboardType={'name-phone-pad'}
@@ -305,14 +311,14 @@ const Signup = () => {
                         {selectPhoneOrRadio === 'phone' ? (
                           <Field
                             name={'phone'}
-                            onBlurValidate={z
+                            onChangeValidate={z
                               .string({
                                 required_error: '이름을 입력해주세요!',
                               })
                               .min(5, {
                                 message: '이름을 5글자 이상 입력해주세요!',
                               })}>
-                            {({ value, setValue, errors }) => {
+                            {({ value, setValue, errors, validate }) => {
                               return (
                                 <Input
                                   value={value}
@@ -320,9 +326,10 @@ const Signup = () => {
                                   onChangeText={setValue}
                                   error={errors[0]}
                                   placeholder="핸드폰 번호"
-                                  onSubmitEditing={() =>
-                                    signupMutate(formValues as SignupParam)
-                                  }
+                                  onSubmitEditing={() => {
+                                    validate('onChangeValidate');
+                                    signupMutate(formValues as SignupParam);
+                                  }}
                                   keyboardType={'phone-pad'}
                                 />
                               );
@@ -331,14 +338,15 @@ const Signup = () => {
                         ) : (
                           <Field
                             name={'email'}
-                            onBlurValidate={z
+                            onChangeValidate={z
                               .string({
                                 required_error: '이름을 입력해주세요!',
                               })
+                              .email()
                               .min(5, {
                                 message: '이름을 5글자 이상 입력해주세요!',
                               })}>
-                            {({ value, setValue, errors }) => {
+                            {({ value, setValue, errors, validate }) => {
                               return (
                                 <Input
                                   value={value}
@@ -346,9 +354,10 @@ const Signup = () => {
                                   onChangeText={setValue}
                                   error={errors[0]}
                                   placeholder="이메일"
-                                  onSubmitEditing={() =>
-                                    signupMutate(formValues as SignupParam)
-                                  }
+                                  onSubmitEditing={() => {
+                                    validate('onChangeValidate');
+                                    signupMutate(formValues as SignupParam);
+                                  }}
                                   keyboardType={'email-address'}
                                 />
                               );
@@ -360,14 +369,14 @@ const Signup = () => {
                     <View>
                       <Field
                         name={'code'}
-                        onBlurValidate={z
+                        onChangeValidate={z
                           .string({
-                            required_error: '비밀번호를 입력해주세요!',
+                            required_error: '코드를 입력해주세요!',
                           })
-                          .min(5, {
-                            message: '비밀번호를 입력해주세요',
+                          .min(6, {
+                            message: '코드를 입력해주세요!',
                           })}>
-                        {({ value, setValue, errors }) => {
+                        {({ value, setValue, errors, onBlur, validate }) => {
                           return (
                             <Input
                               value={value}
@@ -376,7 +385,9 @@ const Signup = () => {
                               error={errors[0]}
                               placeholder="인증번호"
                               label={'인증번호'}
-                              onSubmitEditing={() => {
+                              onSubmitEditing={onBlur}
+                              onBlur={() => {
+                                validate('onChangeValidate');
                                 verifyCheckMutate({
                                   code: value,
                                   type: selectPhoneOrRadio,
